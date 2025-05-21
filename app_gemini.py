@@ -14,6 +14,9 @@ import logging
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
+from gsheets_service import obter_sheets_service, ID_PLANILHA_GSHEETS, TIPO_ENTRADA_GSHEETS, TIPO_DADO_GSHEETS
+from jira_service import campoNorma, campoSeveridade, campoDescricao, campoDeficiencia, campoFonte, campoStatus, campoSugestaoCorrecao, obter_jira_service
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -22,57 +25,11 @@ UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'html', 'txt', 'png', 'jpg', 'jpeg'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-GEMINI_API_KEY = os.getenv("GOOGLE_API_KEY", "chaver")
+GEMINI_API_KEY = os.getenv("GOOGLE_API_KEY", "")
 genai.configure(api_key=GEMINI_API_KEY)
-
-campoNorma = "customfield_10060"
-campoSeveridade = "customfield_10058"
-campoDescricao = "customfield_10092"
-campoDeficiencia = "customfield_10093"
-campoFonte = "customfield_10094"
-campoStatus = "customfield_10091"
-campoSugestaoCorrecao = "customfield_10095"
-
-SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
-ID_PLANILHA_GSHEETS = os.getenv("ID_PLANILHA_GSHEETS")
-TIPO_ENTRADA_GSHEETS = "USER_ENTERED"
-TIPO_DADO_GSHEETS = "INSERT_ROWS"
-
-# Google Sheets setup
-GSHEETS_CRED = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
-
-def obter_sheets_service():
-    modo = os.getenv("AUTH_MODE", "installed").lower()
-    caminho_credencial = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-
-    if modo == "service":
-        try:
-            credentials = service_account.Credentials.from_service_account_file(
-                caminho_credencial, scopes=SCOPES
-            )
-            return build("sheets", "v4", credentials=credentials)
-        except Exception as e:
-            flash(f"❌ Erro com conta de serviço: {e}")
-            raise
-
-    elif modo == "installed":
-        try:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                caminho_credencial, SCOPES
-            )
-            creds = flow.run_local_server(port=0)
-            return build("sheets", "v4", credentials=creds)
-        except Exception as e:
-            flash(f"❌ Erro com conta instalada (OAuth): {e}")
-            raise
-
-    else:
-        raise ValueError("⚠️ AUTH_MODE inválido: use 'installed' ou 'service'")
-
-
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -172,8 +129,7 @@ def upload():
 
         #Jira + Google Sheets
         try:
-            jiraServer = {'server': os.getenv("JIRA_SERVER")}
-            jira = JIRA(jiraServer, basic_auth=(os.getenv("JIRA_EMAIL"), os.getenv("JIRA_TOKEN")))
+            jira = obter_jira_service()
         
             sheets_service = obter_sheets_service()
             barreiras_gsheets = []
@@ -194,13 +150,13 @@ def upload():
                     'summary': resumo,
                     'description': descricao,
                     'issuetype': {'name': 'Task'},
-                    #campoDescricao: barreira['Descrição da Barreira'],
-                    #campoDeficiencia: barreira['Deficiência Impactada'],
-                    #campoSeveridade: barreira['Severidade'],
-                    #campoNorma: barreira['Regra Avaliada'],
-                    #campoFonte: barreira['Fonte da Norma'],
-                    #campoStatus: barreira['status'],
-                    #campoSugestaoCorrecao: barreira['Sugestão de Correção'],
+                    campoDescricao: barreira['Descrição da Barreira'],
+                    campoDeficiencia: barreira['Deficiência Impactada'],
+                    campoSeveridade: barreira['Severidade'],
+                    campoNorma: barreira['Regra Avaliada'],
+                    campoFonte: barreira['Fonte da Norma'],
+                    campoStatus: barreira['status'],
+                    campoSugestaoCorrecao: barreira['Sugestão de Correção'],
                 }
 
                 barreiras_gsheets.append([
