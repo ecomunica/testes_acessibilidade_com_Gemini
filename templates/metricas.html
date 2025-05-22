@@ -62,6 +62,13 @@
         border-radius: 6px;
       }
 
+      .graficos-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+        margin-top: 2rem;
+      }
+
       #tabelaMetricas td,
       #tabelaMetricas th {
         word-break: break-word;
@@ -189,12 +196,12 @@
         </div>
       </div>
 
-      <h3 class="mt-5">Métricas Agregadas</h3>
-      <p>Severidade média por Tela (Regra Avaliada):</p>
-      <canvas id="graficoSeveridade" height="100"></canvas>
-
-      <h3 class="mt-5">Ocorrências por Tipo de Deficiência</h3>
-      <canvas id="graficoDeficiencia" height="100"></canvas>
+      <div>
+        <h3>Severidade Média por Tela</h3>
+        <canvas id="graficoSeveridade" height="100"></canvas>
+        <h3>Ocorrências por Tipo de Deficiência</h3>
+        <canvas id="graficoDeficiencia" height="100"></canvas>
+      </div>
 
       <div class="table-responsive">
         <table class="table table-bordered" id="tabelaMetricas">
@@ -228,44 +235,49 @@
       </div>
 
       <script>
-        let filtroDeficiencia = "";
-        let filtroSeveridade = "";
+      let filtroDeficiencia = "";
+      let filtroSeveridade = "";
 
-        function filtrar(tipo, valor) {
-          if (tipo === "deficiencia") {
-            filtroDeficiencia = valor;
-          } else if (tipo === "severidade") {
-            filtroSeveridade = valor;
-          }
+      const dados = {{ metricas | default([]) | tojson | safe }};
 
-          const linhas = document.querySelectorAll("#tabelaMetricas tbody tr");
-          linhas.forEach((linha) => {
-            const deficiencia = linha.cells[2].textContent;
-            const severidade = linha.cells[3].textContent;
+      let graficoSeveridade;
+      let graficoDeficiencia;
 
-            const condDef =
-              !filtroDeficiencia || deficiencia.includes(filtroDeficiencia);
-            const condSev = !filtroSeveridade || severidade === filtroSeveridade;
-
-            linha.style.display = condDef && condSev ? "" : "none";
-          });
+      function filtrar(tipo, valor) {
+        if (tipo === "deficiencia") {
+          filtroDeficiencia = valor;
+        } else if (tipo === "severidade") {
+          filtroSeveridade = valor;
         }
 
-        const dados = {{ metricas | default([]) | tojson | safe }};
+        const linhas = document.querySelectorAll("#tabelaMetricas tbody tr");
+        linhas.forEach((linha) => {
+          const deficiencia = linha.cells[2].textContent;
+          const severidade = linha.cells[3].textContent;
 
-        // Gráfico Severidade Média
+          const condDef = !filtroDeficiencia || deficiencia.includes(filtroDeficiencia);
+          const condSev = !filtroSeveridade || severidade === filtroSeveridade;
+
+          linha.style.display = condDef && condSev ? "" : "none";
+        });
+
+        atualizarGraficos();
+      }
+
+      function atualizarGraficos() {
+        const filtrados = dados.filter((item) => {
+          const condDef = !filtroDeficiencia || item["Tipo de Deficiência Impactada"].includes(filtroDeficiencia);
+          const condSev = !filtroSeveridade || item["Severidade"] === filtroSeveridade;
+          return condDef && condSev;
+        });
+
+        // Atualizar Severidade Média por Tela
         const severidades = {};
-        dados.forEach((item) => {
+        filtrados.forEach((item) => {
           const tela = item["Regra Avaliada"];
-          const severidade =
-            item["Severidade"] === "Alta"
-              ? 3
-              : item["Severidade"] === "Média"
-              ? 2
-              : item["Severidade"] === "Baixa"
-              ? 1
-              : 0;
-
+          const severidade = item["Severidade"] === "Alta" ? 3 :
+                            item["Severidade"] === "Média" ? 2 :
+                            item["Severidade"] === "Baixa" ? 1 : 0;
           if (!severidades[tela]) {
             severidades[tela] = { total: 0, qtd: 0 };
           }
@@ -274,23 +286,56 @@
         });
 
         const labels = Object.keys(severidades);
-        const medias = labels.map(
-          (tela) => (severidades[tela].total / severidades[tela].qtd).toFixed(2)
-        );
+        const medias = labels.map((tela) => (severidades[tela].total / severidades[tela].qtd).toFixed(2));
 
-        new Chart(document.getElementById("graficoSeveridade"), {
+        graficoSeveridade.data.labels = labels;
+        graficoSeveridade.data.datasets[0].data = medias;
+        graficoSeveridade.update();
+
+        const contagemDeficiencia = {};
+        filtrados.forEach((item) => {
+          const tipo = item["Tipo de Deficiência Impactada"];
+          if (tipo) {
+            contagemDeficiencia[tipo] = (contagemDeficiencia[tipo] || 0) + 1;
+          }
+        });
+
+        const labelsDef = Object.keys(contagemDeficiencia);
+        const valoresDef = labelsDef.map((tipo) => contagemDeficiencia[tipo]);
+
+        graficoDeficiencia.data.labels = labelsDef;
+        graficoDeficiencia.data.datasets[0].data = valoresDef;
+        graficoDeficiencia.update();
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const severidades = {};
+        dados.forEach((item) => {
+          const tela = item["Regra Avaliada"];
+          const severidade = item["Severidade"] === "Alta" ? 3 :
+                            item["Severidade"] === "Média" ? 2 :
+                            item["Severidade"] === "Baixa" ? 1 : 0;
+          if (!severidades[tela]) {
+            severidades[tela] = { total: 0, qtd: 0 };
+          }
+          severidades[tela].total += severidade;
+          severidades[tela].qtd += 1;
+        });
+
+        const labels = Object.keys(severidades);
+        const medias = labels.map((tela) => (severidades[tela].total / severidades[tela].qtd).toFixed(2));
+
+        graficoSeveridade = new Chart(document.getElementById("graficoSeveridade"), {
           type: "bar",
           data: {
             labels: labels,
-            datasets: [
-              {
-                label: "Severidade Média",
-                data: medias,
-                backgroundColor: "rgba(54, 162, 235, 0.7)",
-                borderColor: "rgba(54, 162, 235, 1)",
-                borderWidth: 1,
-              },
-            ],
+            datasets: [{
+              label: "Severidade Média",
+              data: medias,
+              backgroundColor: "rgba(54, 162, 235, 0.7)",
+              borderColor: "rgba(54, 162, 235, 1)",
+              borderWidth: 1,
+            }],
           },
           options: {
             responsive: true,
@@ -308,7 +353,6 @@
           },
         });
 
-        // Gráfico Ocorrências por Tipo de Deficiência
         const contagemDeficiencia = {};
         dados.forEach((item) => {
           const tipo = item["Tipo de Deficiência Impactada"];
@@ -320,19 +364,17 @@
         const labelsDef = Object.keys(contagemDeficiencia);
         const valoresDef = labelsDef.map((tipo) => contagemDeficiencia[tipo]);
 
-        new Chart(document.getElementById("graficoDeficiencia"), {
+        graficoDeficiencia = new Chart(document.getElementById("graficoDeficiencia"), {
           type: "bar",
           data: {
             labels: labelsDef,
-            datasets: [
-              {
-                label: "Ocorrências",
-                data: valoresDef,
-                backgroundColor: "rgba(255, 99, 132, 0.7)",
-                borderColor: "rgba(255, 99, 132, 1)",
-                borderWidth: 1,
-              },
-            ],
+            datasets: [{
+              label: "Ocorrências",
+              data: valoresDef,
+              backgroundColor: "rgba(255, 99, 132, 0.7)",
+              borderColor: "rgba(255, 99, 132, 1)",
+              borderWidth: 1,
+            }],
           },
           options: {
             responsive: true,
@@ -343,14 +385,13 @@
                   display: true,
                   text: "Número de Ocorrências",
                 },
-                ticks: {
-                  precision: 0,
-                },
+                ticks: { precision: 0 },
               },
             },
           },
         });
-      </script>
+      });
+    </script>
     </main>
     <footer>
       <div class="imagem">
