@@ -45,6 +45,15 @@
         color: #fff !important;
       }
 
+      .nav-tabs .nav-link {
+        color: #000 !important; /* Sempre preto */
+      }
+
+      .nav-tabs .nav-link.active {
+        color: #000 !important;
+        background-color: #e9ecef; /* ou remova essa linha */
+      }
+
       /* Rodapé */
       footer {
         background-color: #163f61;
@@ -120,53 +129,115 @@
           style="max-width: 800px; height: auto"
         />
       </div>
-
-      {% with messages = get_flashed_messages() %} {% if messages %}
-      <div class="alert alert-warning" role="alert" aria-live="polite">
-        {% for message in messages %}
-        <div>{{ message }}</div>
-        {% endfor %}
-      </div>
-      {% endif %} {% endwith %}
-
-      <div class="card shadow-sm" aria-labelledby="formulario-envio">
-        <div class="card-body">
-          <form
-            action="{{ url_for('upload') }}"
-            method="POST"
-            enctype="multipart/form-data"
-            aria-describedby="ajuda-formulario"
-          >
-            <div class="mb-3">
-              <label for="file" class="form-label">📁 Enviar arquivo</label>
-              <input
-                type="file"
-                class="form-control"
-                id="file"
-                name="file"
-                required
-                aria-required="true"
-                aria-describedby="ajuda-formato"
-                data-bs-toggle="tooltip"
-                title="Aceita arquivos .html, .txt, .png ou .jpg"
-                accept=".html,.txt,.png,.jpg,.jpeg"
-              />
-              <div id="ajuda-formato" class="form-text text-muted">
-                Envie uma interface para análise automatizada de acessibilidade.
-                Aceita .html, .txt, .png, .jpg.
+      <div class="row">
+        <div class="panel with-nav-tabs panel-default">
+          <div class="panel-heading">
+            <ul class="nav nav-tabs" id="mainTabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link active"
+                  id="upload-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#upload"
+                  type="button"
+                  role="tab"
+                  aria-controls="upload"
+                  aria-selected="true"
+                >
+                  📁 Enviar arquivo
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link"
+                  id="metricas-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#metricas"
+                  type="button"
+                  role="tab"
+                  aria-controls="metricas"
+                  aria-selected="false"
+                >
+                  📈 Obter Métricas
+                </button>
+              </li>
+            </ul>
+          </div>
+          <div class="tab-content" id="mainTabsContent">
+            <div
+              class="tab-pane fade show active"
+              id="upload"
+              role="tabpanel"
+              aria-labelledby="upload-tab"
+            >
+              <div class="card shadow-sm" aria-labelledby="formulario-envio">
+                <div class="card-body">
+                  <form
+                    action="{{ url_for('upload') }}"
+                    method="POST"
+                    enctype="multipart/form-data"
+                    aria-describedby="ajuda-formulario"
+                  >
+                    <div class="mb-3">
+                      <input
+                        type="file"
+                        class="form-control"
+                        id="file"
+                        name="file"
+                        required
+                        aria-required="true"
+                        aria-describedby="ajuda-formato"
+                        data-bs-toggle="tooltip"
+                        title="Aceita arquivos .html, .txt, .png ou .jpg"
+                        accept=".html,.txt,.png,.jpg,.jpeg"
+                      />
+                      <div id="ajuda-formato" class="form-text text-muted">
+                        Envie uma interface para análise automatizada de
+                        acessibilidade. Aceita .html, .txt, .png, .jpg.
+                      </div>
+                    </div>
+                    <button
+                      class="btn w-100 text-white bg-custom-blue"
+                      type="submit"
+                      aria-label="Iniciar análise de acessibilidade"
+                      data-bs-toggle="tooltip"
+                      title="Clique para analisar acessibilidade conforme WCAG/eMAG"
+                    >
+                      ♿ Avaliar Acessibilidade Digital
+                    </button>
+                  </form>
+                </div>
               </div>
             </div>
-
-            <button
-              class="btn w-100 text-white bg-custom-blue"
-              type="submit"
-              aria-label="Iniciar análise de acessibilidade"
-              data-bs-toggle="tooltip"
-              title="Clique para analisar acessibilidade conforme WCAG/eMAG"
+            <div
+              class="tab-pane fade"
+              id="metricas"
+              role="tabpanel"
+              aria-labelledby="metricas-tab"
             >
-              ♿ Avaliar Acessibilidade Digital
-            </button>
-          </form>
+              <div class="card shadow-sm" aria-labelledby="metricas">
+                <div class="card-body">
+                  <form
+                    action="{{ url_for('metricas') }}"
+                    method="POST"
+                    aria-describedby="ajuda-metricas"
+                  >
+                    <div class="mb-3">
+                      <button
+                        class="btn w-100 text-white bg-custom-blue"
+                        type="submit"
+                        data-bs-toggle="tooltip"
+                        aria-label="Obter métricas de barreiras de acessibilidade"
+                        title="Clique para obter métricas de barreiras de acessibilidade"
+                      >
+                        ♿ Visualizar Métricas de Barreiras
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </main>

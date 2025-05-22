@@ -194,6 +194,39 @@ def feedback():
     flash(f"Feedback enviado para barreira {id_barreira}: {status}")
     return redirect(url_for('index'))
 
+@app.route('/metricas', methods=['POST'])
+def metricas():
+    try:
+        sheets_service = obter_sheets_service()
+        resultado = sheets_service.spreadsheets().values().get(
+            spreadsheetId=ID_PLANILHA_GSHEETS,
+            range="Barreiras!A1:H"
+        ).execute()
+
+        valores = resultado.get('values', [])
+        if not valores:
+            flash("Nenhum dado encontrado.")
+            return redirect(url_for('index'))
+
+        metricas = []
+        for linha in valores[1:]:
+            if len(linha) >= 8:
+                metricas.append({
+                    "Descrição da Barreira": linha[0],
+                    "Deficiência Impactada": linha[1],
+                    "Tipo de Deficiência Impactada": linha[2],
+                    "Severidade": linha[3],
+                    "Sugestão de Correção": linha[4],
+                    "Fonte da Norma": linha[5],
+                    "Regra Avaliada": linha[6],
+                    "Status": linha[7],
+                })
+
+        return render_template('metricas.html', metricas=metricas)
+    except Exception as e:
+        flash(f"Erro ao buscar métricas: {e}")
+        return redirect(url_for('index'))
+
 def construir_prompt(content):
     return f"""Você é um auditor especialista em acessibilidade digital com conhecimento técnico aprofundado nas diretrizes:
 
