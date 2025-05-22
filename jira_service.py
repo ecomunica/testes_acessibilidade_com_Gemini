@@ -14,13 +14,13 @@ import logging
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
-campoNorma = os.getenv("CAMPO_NORMA")
-campoSeveridade = os.getenv("CAMPO_SEVERIDADE")
-campoDescricao = os.getenv("CAMPO_DESCRICAO")
-campoDeficiencia = os.getenv("CAMPO_DEFICIENCIA")
-campoFonte = os.getenv("CAMPO_FONTE")
-campoStatus = os.getenv("CAMPO_STATUS")
-campoSugestaoCorrecao = os.getenv("CAMPO_SUGESTAO_CORRECAO")
+campoNorma = os.getenv("CAMPO_JIRA_NORMA")
+campoSeveridade = os.getenv("CAMPO_JIRA_SEVERIDADE")
+campoDescricao = os.getenv("CAMPO_JIRA_DESCRICAO")
+campoDeficiencia = os.getenv("CAMPO_JIRA_DEFICIENCIA")
+campoFonte = os.getenv("CAMPO_JIRA_FONTE")
+campoStatus = os.getenv("CAMPO_JIRA_STATUS")
+campoSugestaoCorrecao = os.getenv("CAMPO_JIRA_SUGESTAO_CORRECAO")
 
 def obter_jira_service():
     jiraServer = {'server': os.getenv("JIRA_SERVER")}
