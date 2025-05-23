@@ -10,9 +10,6 @@ import logging
 from gsheets_service import obter_sheets_service, ID_PLANILHA_GSHEETS, TIPO_ENTRADA_GSHEETS, TIPO_DADO_GSHEETS
 from jira_service import campoNorma, campoSeveridade, campoDescricao, campoDeficiencia, campoFonte, campoStatus, campoSugestaoCorrecao, obter_jira_service
 
-from gsheets_service import obter_sheets_service, ID_PLANILHA_GSHEETS, TIPO_ENTRADA_GSHEETS, TIPO_DADO_GSHEETS
-from jira_service import campoNorma, campoSeveridade, campoDescricao, campoDeficiencia, campoFonte, campoStatus, campoSugestaoCorrecao, obter_jira_service
-
 load_dotenv()
 
 app = Flask(__name__)
@@ -146,13 +143,13 @@ def upload():
                     'summary': resumo,
                     'description': descricao,
                     'issuetype': {'name': 'Task'},
-                    campoDescricao: barreira['Descrição da Barreira'],
-                    campoDeficiencia: barreira['Deficiência Impactada'],
-                    campoSeveridade: barreira['Severidade'],
-                    campoNorma: barreira['Regra Avaliada'],
-                    campoFonte: barreira['Fonte da Norma'],
-                    campoStatus: barreira['status'],
-                    campoSugestaoCorrecao: barreira['Sugestão de Correção'],
+                    #campoNorma: barreira['Regra Avaliada'],
+                    #campoDescricao: barreira['Descrição da Barreira'],
+                    #campoDeficiencia: barreira['Deficiência Impactada'],
+                    #campoSeveridade: barreira['Severidade'],
+                    #campoFonte: barreira['Fonte da Norma'],
+                    #campoStatus: barreira['status'],
+                    #campoSugestaoCorrecao: barreira['Sugestão de Correção'],
                 }
 
                 barreiras_gsheets.append([
