@@ -3,15 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <title>Métricas de Acessibilidade</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    />
     <link
       rel="icon"
-      href="../static/_avaliacao-de-acessibilidade-digital.HT.PNG"
+      href="../static/avaliacao-de-acessibilidade-digital.HT.png"
       type="image/png"
     />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-      html, body {
+    <style>
+      html,
+      body {
         height: 100%;
         margin: 0;
       }
@@ -42,8 +46,8 @@
       }
       .high-contrast .form-control:focus,
       .high-contrast .btn:focus {
-        outline: 2px solid #000 !important;
-        outline-offset: 2px;
+        background-color: #163f61;
+        outline: 2px solid #ccc !important;
         box-shadow: none !important;
       }
       .high-contrast .nav-link.active {
@@ -55,6 +59,11 @@
       .high-contrast .tab-pane {
         background-color: #2b2b2b !important;
         color: #ffffff !important;
+      }
+      .form-control:focus,
+      .btn:focus {
+        outline: 2px solid #163f61 !important;
+        box-shadow: none !important;
       }
       header {
         background-color: #163f61;
@@ -91,7 +100,9 @@
         justify-content: space-between;
         align-items: center;
       }
-      footer .imagem, footer .diretrizes, footer .github {
+      footer .imagem,
+      footer .diretrizes,
+      footer .github {
         flex: 1 1 200px;
         margin-bottom: 15px;
       }
@@ -100,7 +111,8 @@
         margin-right: 10px;
         margin-top: 10px;
       }
-      footer .diretrizes a, footer .github a {
+      footer .diretrizes a,
+      footer .github a {
         color: #f1f1f1;
         font-size: 16px;
         text-decoration: underline;
@@ -113,289 +125,519 @@
         background-color: #d0e5f7 !important;
         color: #000 !important;
       }
+      .nav-link {
+        border: 2px solid #163f61 !important;
+        color: #163f61;
+        border-radius: 0.375rem;
+      }
       .nav-link.active {
-        background-color: #163f61 !important; /* seu azul escuro do header */
-        color: #fff !important; /* texto branco para contraste */
-        border: 2px solid #0f2f4a !important; /* borda um pouco mais escura para destaque */
-        border-radius: 0.375rem; /* mantém o arredondamento do Bootstrap */
+        background-color: #163f61 !important;
+        color: #fff !important;
+        border: 2px solid #0f2f4a !important;
+        border-radius: 0.375rem;
+      }
+      #tabelaMetricas tbody tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+      #tabelaMetricas th,
+      #tabelaMetricas td {
+        border: 1px solid #ccc !important;
+      }
+      #tabelaMetricas {
+        border-collapse: separate !important;
+        border-spacing: 0;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      #tabelaMetricas thead th:first-child {
+        border-top-left-radius: 10px;
+      }
+      #tabelaMetricas thead th:last-child {
+        border-top-right-radius: 8px;
+      }
+      #tabelaMetricas tbody tr:last-child td:first-child {
+        border-bottom-left-radius: 8px;
+      }
+      #tabelaMetricas tbody tr:last-child td:last-child {
+        border-bottom-right-radius: 8px;
+      }
+
+      body.high-contrast .btn-primary,
+      body.high-contrast .btn-secondary,
+      body.high-contrast .btn-danger,
+      body.high-contrast .btn-warning,
+      body.high-contrast .btn-success {
+        border-color: #ccc !important;
+        font-weight: bold;
+      }
+      body.high-contrast .btn-primary {
+        color: #1f8dd6 !important;
+      }
+
+      body.high-contrast .btn-secondary {
+        color: #1f8dd6 !important;
+      }
+
+      body.high-contrast .btn-danger {
+        color: #e53935 !important;
+      }
+
+      body.high-contrast .btn-warning {
+        color: #fbc02d !important;
+      }
+
+      body.high-contrast .btn-success {
+        color: #43a047 !important;
+      }
+
+      body.high-contrast .btn-primary:hover,
+      body.high-contrast.btn-secondary:hover {
+        opacity: 0.9;
+      }
+      #tabelaMetricas {
+        background-color: #345e88;
+        border-collapse: separate !important;
+        border-spacing: 0;
+        border-radius: 8px;
+        overflow: hidden;
       }
     </style>
   </head>
   <body class="bg-home-light">
-    <button class="btn btn-outline-dark btn-sm btn-contrast-toggle" onclick="toggleContrast()" aria-label="Ativar ou desativar contraste">
+    <button
+      class="btn btn-outline-dark btn-sm btn-contrast-toggle"
+      onclick="toggleContrast()"
+      aria-label="Ativar ou desativar contraste"
+    >
       🔳 Modo escuro
     </button>
 
     <header>
-      <img src="{{ url_for('static', filename='_avaliacao-de-acessibilidade-digital.png') }}" alt="Logotipo Avaliação de Acessibilidade Digital" class="img-fluid" />
+      <img
+        src="{{ url_for('static', filename='_avaliacao-de-acessibilidade-digital.png') }}"
+        alt="Logotipo Avaliação de Acessibilidade Digital"
+        class="img-fluid"
+      />
     </header>
 
     <main class="container py-4">
       <ul class="nav nav-tabs" id="mainTabs" role="tablist">
         <li class="nav-item" role="presentation">
-          <button class="nav-link" id="upload-tab" data-bs-toggle="tab" data-bs-target="#upload" type="button" role="tab" aria-controls="upload" aria-selected="false">
+          <button
+            class="nav-link"
+            id="upload-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#upload"
+            type="button"
+            role="tab"
+            aria-controls="upload"
+            aria-selected="false"
+          >
             📁 Enviar arquivo
           </button>
         </li>
         <li class="nav-item" role="presentation">
-          <button class="nav-link active" id="metricas-tab" data-bs-toggle="tab" data-bs-target="#metricas" type="button" role="tab" aria-controls="metricas" aria-selected="true">
+          <button
+            class="nav-link active"
+            id="metricas-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#metricas"
+            type="button"
+            role="tab"
+            aria-controls="metricas"
+            aria-selected="true"
+          >
             📈 Obter Métricas
           </button>
         </li>
       </ul>
 
       <div class="tab-content" id="mainTabsContent">
-        <div class="tab-pane fade" id="upload" role="tabpanel" aria-labelledby="upload-tab">
-          <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+        <div
+          class="tab-pane fade"
+          id="upload"
+          role="tabpanel"
+          aria-labelledby="upload-tab"
+        >
+          <form
+            action="{{ url_for('upload') }}"
+            method="POST"
+            enctype="multipart/form-data"
+          >
             <div class="mb-3">
-              <label for="file" class="form-label">Selecione um arquivo para análise:</label>
-              <input type="file" class="form-control" id="file" name="file" required accept=".html,.txt,.png,.jpg,.jpeg" />
-              <div class="form-text">Aceita arquivos .html, .txt, .png ou .jpg.</div>
+              <label for="file" class="form-label"
+                >Selecione um arquivo para análise:</label
+              >
+              <input
+                type="file"
+                class="form-control"
+                id="file"
+                name="file"
+                required
+                accept=".html,.txt,.png,.jpg,.jpeg"
+              />
+              <div class="form-text">
+                Aceita arquivos .html, .txt, .png ou .jpg.
+              </div>
             </div>
-            <button type="submit" class="btn btn-primary w-100">♿ Avaliar Acessibilidade</button>
+            <button type="submit" class="btn btn-primary w-100">
+              ♿ Avaliar Acessibilidade
+            </button>
           </form>
         </div>
 
-        <div class="tab-pane fade show active" id="metricas" role="tabpanel" aria-labelledby="metricas-tab">
-          <div class="d-flex align-items-center justify-content-between gap-2 mb-4">
-  
-  <div>
-    <h5>Filtrar por Severidade:</h5>
-    <div class="btn-group" role="group" aria-label="Filtros por severidade">
-      <button class="btn btn-primary" onclick="filtrar('severidade', '')">Todos</button>
-      <button class="btn btn-danger" onclick="filtrar('severidade', 'Alta')">Alta</button>
-      <button class="btn btn-warning" onclick="filtrar('severidade', 'Média')">Média</button>
-      <button class="btn btn-success" onclick="filtrar('severidade', 'Baixa')">Baixa</button>
-    </div>
-  </div>
-</div>
-<div class="form-check form-switch mb-4">
-  <input class="form-check-input" type="checkbox" role="switch" id="layoutToggle" onchange="alternarLayout()">
-  <label class="form-check-label" for="layoutToggle">Empilhar gráficos verticalmente</label>
-</div>
+        <div
+          class="tab-pane fade show active"
+          id="metricas"
+          role="tabpanel"
+          aria-labelledby="metricas-tab"
+        >
+          <div
+            class="d-flex align-items-center justify-content-between gap-2 mb-4"
+          >
+            <div>
+              <h5>Filtrar por Severidade:</h5>
+              <div
+                class="btn-group"
+                role="group"
+                aria-label="Filtros por severidade"
+              >
+                <button
+                  class="btn btn-primary"
+                  onclick="filtrar('severidade', '')"
+                >
+                  Todos
+                </button>
+                <button
+                  class="btn btn-danger"
+                  onclick="filtrar('severidade', 'Alta')"
+                >
+                  Alta
+                </button>
+                <button
+                  class="btn btn-warning"
+                  onclick="filtrar('severidade', 'Média')"
+                >
+                  Média
+                </button>
+                <button
+                  class="btn btn-success"
+                  onclick="filtrar('severidade', 'Baixa')"
+                >
+                  Baixa
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="form-check form-switch mb-4">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              role="switch"
+              id="layoutToggle"
+              onchange="alternarLayout()"
+            />
+            <label class="form-check-label" for="layoutToggle"
+              >Empilhar gráficos verticalmente</label
+            >
+          </div>
 
-  <div class="w-100">
-    <h4>Severidade Média por Regra Avaliada</h4>
-    <canvas id="graficoSeveridade"></canvas>
-  </div>
+          <div class="w-100">
+            <h4>Severidade Média por Regra Avaliada</h4>
+            <canvas id="graficoSeveridade"></canvas>
+          </div>
 
-  <div>
-    <h5>Filtrar por Deficiência:</h5>
-    <div class="btn-group" role="group" aria-label="Filtros por deficiência">
-      <button class="btn btn-primary" onclick="filtrar('deficiencia', '')">Todos</button>
-      <button class="btn btn-secondary" onclick="filtrar('deficiencia', 'Auditiva')">Auditiva</button>
-      <button class="btn btn-secondary" onclick="filtrar('deficiencia', 'Visual')">Visual</button>
-      <button class="btn btn-secondary" onclick="filtrar('deficiencia', 'Motora')">Motora</button>
-      <button class="btn btn-secondary" onclick="filtrar('deficiencia', 'Cognitiva')">Cognitiva</button>
-    </div>
-  </div>
-  
-  <div class="w-100">
-    <h4>Ocorrências por Tipo de Deficiência</h4>
-    <canvas id="graficoDeficiencia"></canvas>
-  </div>
-</div>
-<div class="table-responsive mt-4">
-  <table class="table table-bordered table-striped align-middle shadow-sm" id="tabelaMetricas">
-    <thead class="table-light">
-      <tr>
-        <th>Descrição da Barreira</th>
-        <th>Deficiência Impactada</th>
-        <th>Tipo de Deficiência Impactada</th>
-        <th>Severidade</th>
-        <th>Sugestão de Correção</th>
-        <th>Fonte da Norma</th>
-        <th>Regra Avaliada</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for barreira in metricas %}
-      <tr>
-        <td>{{ barreira['Descrição da Barreira'] }}</td>
-        <td>{{ barreira['Deficiência Impactada'] }}</td>
-        <td>{{ barreira['Tipo de Deficiência Impactada'] }}</td>
-        <td>{{ barreira['Severidade'] }}</td>
-        <td>{{ barreira['Sugestão de Correção'] }}</td>
-        <td>{{ barreira['Fonte da Norma'] }}</td>
-        <td>{{ barreira['Regra Avaliada'] }}</td>
-        <td>{{ barreira['Status'] }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
+          <div>
+            <h5 style="margin-top: 45px">Filtrar por Deficiência:</h5>
+            <div
+              class="btn-group"
+              role="group"
+              aria-label="Filtros por deficiência"
+            >
+              <button
+                class="btn btn-primary"
+                onclick="filtrar('deficiencia', '')"
+              >
+                Todos
+              </button>
+              <button
+                class="btn btn-secondary"
+                onclick="filtrar('deficiencia', 'Auditiva')"
+              >
+                Auditiva
+              </button>
+              <button
+                class="btn btn-secondary"
+                onclick="filtrar('deficiencia', 'Visual')"
+              >
+                Visual
+              </button>
+              <button
+                class="btn btn-secondary"
+                onclick="filtrar('deficiencia', 'Motora')"
+              >
+                Motora
+              </button>
+              <button
+                class="btn btn-secondary"
+                onclick="filtrar('deficiencia', 'Cognitiva')"
+              >
+                Cognitiva
+              </button>
+            </div>
+          </div>
+
+          <div class="w-100">
+            <h4 style="margin-top: 45px">
+              Ocorrências por Tipo de Deficiência
+            </h4>
+            <canvas id="graficoDeficiencia"></canvas>
+          </div>
+        </div>
+        <div class="table-responsive mt-4">
+          <table
+            class="table table-bordered table-striped align-middle shadow-sm"
+            id="tabelaMetricas"
+          >
+            <thead class="table-light">
+              <tr>
+                <th>Descrição da Barreira</th>
+                <th>Deficiência Impactada</th>
+                <th>Tipo de Deficiência Impactada</th>
+                <th>Severidade</th>
+                <th>Sugestão de Correção</th>
+                <th>Fonte da Norma</th>
+                <th>Regra Avaliada</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for barreira in metricas %}
+              <tr>
+                <td>{{ barreira['Descrição da Barreira'] }}</td>
+                <td>{{ barreira['Deficiência Impactada'] }}</td>
+                <td>{{ barreira['Tipo de Deficiência Impactada'] }}</td>
+                <td>{{ barreira['Severidade'] }}</td>
+                <td>{{ barreira['Sugestão de Correção'] }}</td>
+                <td>{{ barreira['Fonte da Norma'] }}</td>
+                <td>{{ barreira['Regra Avaliada'] }}</td>
+                <td>{{ barreira['Status'] }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
       </div>
     </main>
 
     <footer>
       <div class="imagem">
-        <p><b>Projeto acadêmico em desenvolvimento.</b><br />Realizado com os incentivos de:</p>
+        <p>
+          <b>Projeto acadêmico em desenvolvimento.</b><br />Realizado com os
+          incentivos de:
+        </p>
         <div>
-          <img src="https://hackathonunicesumar.com.br/_assets/media/e4ce6eacf45ee0739892753a88075a7f.png" alt="Logo da UniCesumar" />
-          <img src="https://hackathonunicesumar.com.br/_assets/media/13548fb8c9f6fa48d68e1cd6cff1f047.png" alt="Logo do Hackathon com Google Cloud" />
+          <img
+            src="https://hackathonunicesumar.com.br/_assets/media/e4ce6eacf45ee0739892753a88075a7f.png"
+            alt="Logo da UniCesumar"
+          />
+          <img
+            src="https://hackathonunicesumar.com.br/_assets/media/13548fb8c9f6fa48d68e1cd6cff1f047.png"
+            alt="Logo do Hackathon com Google Cloud"
+          />
         </div>
       </div>
       <div class="diretrizes">
         <p>Baseado nas diretrizes de Acessibilidade:</p>
-        <p><b><a href="https://www.w3.org/WAI/standards-guidelines/wcag/" target="_blank">WCAG</a> & <a href="https://emag.governoeletronico.gov.br/" target="_blank">eMAG</a></b></p>
+        <p>
+          <b
+            ><a
+              href="https://www.w3.org/WAI/standards-guidelines/wcag/"
+              target="_blank"
+              >WCAG</a
+            >
+            &
+            <a href="https://emag.governoeletronico.gov.br/" target="_blank"
+              >eMAG</a
+            ></b
+          >
+        </p>
       </div>
       <div class="github">
-        <img src="https://img.icons8.com/ios11/512/FFFFFF/github.png" alt="Logo GitHub" />
-        <p>Repositório no <a href="https://github.com/seudominio/seu-projeto" target="_blank"><b>GitHub</b></a></p>
+        <img
+          src="https://img.icons8.com/ios11/512/FFFFFF/github.png"
+          alt="Logo GitHub"
+        />
+        <p>
+          Repositório no
+          <a href="https://github.com/seudominio/seu-projeto" target="_blank"
+            ><b>GitHub</b></a
+          >
+        </p>
       </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
       function toggleContrast() {
-        document.body.classList.toggle("high-contrast");
+        const body = document.body;
+        const btn = document.querySelector(".btn-contrast-toggle");
+
+        body.classList.toggle("high-contrast");
+
+        if (body.classList.contains("high-contrast")) {
+          btn.classList.remove("btn-outline-dark");
+          btn.classList.add("btn-outline-light");
+          btn.textContent = "🔲 Modo claro";
+        } else {
+          btn.classList.remove("btn-outline-light");
+          btn.classList.add("btn-outline-dark");
+          btn.textContent = "🔳 Modo escuro";
+        }
       }
     </script>
-  <script>
-const dados = {{ metricas | default([]) | tojson | safe }};
-let filtroDeficiencia = "";
-let filtroSeveridade = "";
-let graficoSeveridade;
-let graficoDeficiencia;
+    <script>
+      const dados = {{ metricas | default([]) | tojson | safe }};
+      let filtroDeficiencia = "";
+      let filtroSeveridade = "";
+      let graficoSeveridade;
+      let graficoDeficiencia;
 
-function filtrar(tipo, valor) {
-  if (tipo === "deficiencia") filtroDeficiencia = valor;
-  if (tipo === "severidade") filtroSeveridade = valor;
+      function filtrar(tipo, valor) {
+        if (tipo === "deficiencia") filtroDeficiencia = valor;
+        if (tipo === "severidade") filtroSeveridade = valor;
 
-  const linhas = document.querySelectorAll("#tabelaMetricas tbody tr");
-  linhas.forEach((linha) => {
-    const deficiencia = linha.cells[2].textContent;
-    const severidade = linha.cells[3].textContent;
-    const condDef = !filtroDeficiencia || deficiencia.includes(filtroDeficiencia);
-    const condSev = !filtroSeveridade || severidade === filtroSeveridade;
-    linha.style.display = condDef && condSev ? "" : "none";
-  });
+        const linhas = document.querySelectorAll("#tabelaMetricas tbody tr");
+        linhas.forEach((linha) => {
+          const deficiencia = linha.cells[2].textContent;
+          const severidade = linha.cells[3].textContent;
+          const condDef = !filtroDeficiencia || deficiencia.includes(filtroDeficiencia);
+          const condSev = !filtroSeveridade || severidade === filtroSeveridade;
+          linha.style.display = condDef && condSev ? "" : "none";
+        });
 
-  atualizarGraficos();
-}
+        atualizarGraficos();
+      }
 
-function atualizarGraficos() {
-  const filtrados = dados.filter((item) => {
-    const condDef = !filtroDeficiencia || item["Tipo de Deficiência Impactada"].includes(filtroDeficiencia);
-    const condSev = !filtroSeveridade || item["Severidade"] === filtroSeveridade;
-    return condDef && condSev;
-  });
+      function atualizarGraficos() {
+        const filtrados = dados.filter((item) => {
+          const condDef = !filtroDeficiencia || item["Tipo de Deficiência Impactada"].includes(filtroDeficiencia);
+          const condSev = !filtroSeveridade || item["Severidade"] === filtroSeveridade;
+          return condDef && condSev;
+        });
 
-  const severidades = {};
-  filtrados.forEach((item) => {
-    const tela = item["Regra Avaliada"];
-    const sev = item["Severidade"] === "Alta" ? 3 : item["Severidade"] === "Média" ? 2 : item["Severidade"] === "Baixa" ? 1 : 0;
-    if (!severidades[tela]) severidades[tela] = { total: 0, qtd: 0 };
-    severidades[tela].total += sev;
-    severidades[tela].qtd += 1;
-  });
+        const severidades = {};
+        filtrados.forEach((item) => {
+          const tela = item["Regra Avaliada"];
+          const sev = item["Severidade"] === "Alta" ? 3 : item["Severidade"] === "Média" ? 2 : item["Severidade"] === "Baixa" ? 1 : 0;
+          if (!severidades[tela]) severidades[tela] = { total: 0, qtd: 0 };
+          severidades[tela].total += sev;
+          severidades[tela].qtd += 1;
+        });
 
-  const labels = Object.keys(severidades);
-  const medias = labels.map((tela) => (severidades[tela].total / severidades[tela].qtd).toFixed(2));
+        const labels = Object.keys(severidades);
+        const medias = labels.map((tela) => (severidades[tela].total / severidades[tela].qtd).toFixed(2));
 
-  graficoSeveridade.data.labels = labels;
-  graficoSeveridade.data.datasets[0].data = medias;
-  graficoSeveridade.update();
+        graficoSeveridade.data.labels = labels;
+        graficoSeveridade.data.datasets[0].data = medias;
+        graficoSeveridade.update();
 
-  const contagemDef = {};
-  filtrados.forEach((item) => {
-    const tipo = item["Tipo de Deficiência Impactada"];
-    if (tipo) contagemDef[tipo] = (contagemDef[tipo] || 0) + 1;
-  });
+        const contagemDef = {};
+        filtrados.forEach((item) => {
+          const tipo = item["Tipo de Deficiência Impactada"];
+          if (tipo) contagemDef[tipo] = (contagemDef[tipo] || 0) + 1;
+        });
 
-  const labelsDef = Object.keys(contagemDef);
-  const valoresDef = labelsDef.map((tipo) => contagemDef[tipo]);
+        const labelsDef = Object.keys(contagemDef);
+        const valoresDef = labelsDef.map((tipo) => contagemDef[tipo]);
 
-  graficoDeficiencia.data.labels = labelsDef;
-  graficoDeficiencia.data.datasets[0].data = valoresDef;
-  graficoDeficiencia.update();
-}
+        graficoDeficiencia.data.labels = labelsDef;
+        graficoDeficiencia.data.datasets[0].data = valoresDef;
+        graficoDeficiencia.update();
+      }
 
-window.addEventListener("DOMContentLoaded", () => {
-  const severidades = {};
-  dados.forEach((item) => {
-    const tela = item["Regra Avaliada"];
-    const sev = item["Severidade"] === "Alta" ? 3 : item["Severidade"] === "Média" ? 2 : item["Severidade"] === "Baixa" ? 1 : 0;
-    if (!severidades[tela]) severidades[tela] = { total: 0, qtd: 0 };
-    severidades[tela].total += sev;
-    severidades[tela].qtd += 1;
-  });
+      window.addEventListener("DOMContentLoaded", () => {
+        const severidades = {};
+        dados.forEach((item) => {
+          const tela = item["Regra Avaliada"];
+          const sev = item["Severidade"] === "Alta" ? 3 : item["Severidade"] === "Média" ? 2 : item["Severidade"] === "Baixa" ? 1 : 0;
+          if (!severidades[tela]) severidades[tela] = { total: 0, qtd: 0 };
+          severidades[tela].total += sev;
+          severidades[tela].qtd += 1;
+        });
 
-  const labels = Object.keys(severidades);
-  const medias = labels.map((tela) => (severidades[tela].total / severidades[tela].qtd).toFixed(2));
+        const labels = Object.keys(severidades);
+        const medias = labels.map((tela) => (severidades[tela].total / severidades[tela].qtd).toFixed(2));
 
-  graficoSeveridade = new Chart(document.getElementById("graficoSeveridade"), {
-    type: "bar",
-    data: {
-      labels: labels,
-      datasets: [{
-        label: "Severidade Média",
-        data: medias,
-        backgroundColor: "rgba(54, 162, 235, 0.7)",
-        borderColor: "rgba(54, 162, 235, 1)",
-        borderWidth: 1,
-      }],
-    },
-    options: {
-      responsive: true,
-      scales: {
-        y: {
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: "Severidade (1=Baixa, 2=Média, 3=Alta)",
+        graficoSeveridade = new Chart(document.getElementById("graficoSeveridade"), {
+          type: "bar",
+          data: {
+            labels: labels,
+            datasets: [{
+              label: "Severidade Média",
+              data: medias,
+              backgroundColor: "rgba(54, 162, 235, 0.7)",
+              borderColor: "rgba(54, 162, 235, 1)",
+              borderWidth: 1,
+            }],
           },
-        },
-      },
-    },
-  });
-
-  const contagemDef = {};
-  dados.forEach((item) => {
-    const tipo = item["Tipo de Deficiência Impactada"];
-    if (tipo) contagemDef[tipo] = (contagemDef[tipo] || 0) + 1;
-  });
-
-  const labelsDef = Object.keys(contagemDef);
-  const valoresDef = labelsDef.map((tipo) => contagemDef[tipo]);
-
-  graficoDeficiencia = new Chart(document.getElementById("graficoDeficiencia"), {
-    type: "bar",
-    data: {
-      labels: labelsDef,
-      datasets: [{
-        label: "Ocorrências",
-        data: valoresDef,
-        backgroundColor: "rgba(255, 99, 132, 0.7)",
-        borderColor: "rgba(255, 99, 132, 1)",
-        borderWidth: 1,
-      }],
-    },
-    options: {
-      responsive: true,
-      scales: {
-        y: {
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: "Número de Ocorrências",
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: "Severidade (1=Baixa, 2=Média, 3=Alta)",
+                },
+              },
+            },
           },
-          ticks: { precision: 0 },
-        },
-      },
-    },
-  });
-});
+        });
 
-function alternarLayout() {
-  const container = document.querySelector('.graficos-container');
-  if (!container) return;
-  const isVertical = document.getElementById('layoutToggle').checked;
-  container.style.flexDirection = isVertical ? 'column' : 'row';
-}
-</script>
+        const contagemDef = {};
+        dados.forEach((item) => {
+          const tipo = item["Tipo de Deficiência Impactada"];
+          if (tipo) contagemDef[tipo] = (contagemDef[tipo] || 0) + 1;
+        });
 
+        const labelsDef = Object.keys(contagemDef);
+        const valoresDef = labelsDef.map((tipo) => contagemDef[tipo]);
 
+        graficoDeficiencia = new Chart(document.getElementById("graficoDeficiencia"), {
+          type: "bar",
+          data: {
+            labels: labelsDef,
+            datasets: [{
+              label: "Ocorrências",
+              data: valoresDef,
+              backgroundColor: "rgba(255, 99, 132, 0.7)",
+              borderColor: "rgba(255, 99, 132, 1)",
+              borderWidth: 1,
+            }],
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: "Número de Ocorrências",
+                },
+                ticks: { precision: 0 },
+              },
+            },
+          },
+        });
+      });
+
+      function alternarLayout() {
+        const container = document.querySelector('.graficos-container');
+        if (!container) return;
+        const isVertical = document.getElementById('layoutToggle').checked;
+        container.style.flexDirection = isVertical ? 'column' : 'row';
+      }
+    </script>
+  </body>
 </html>
