@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Métricas de Acessibilidade</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+      html, body {
+        height: 100%;
+        margin: 0;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+      }
+      header {
+        background-color: #163f61;
+        padding: 1rem;
+        text-align: center;
+      }
+      header img {
+        max-width: 100%;
+        height: auto;
+      }
+      .btn-contrast-toggle {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+      }
+      main {
+        flex: 1 0 auto;
+      }
+      .tab-pane {
+        padding: 2rem 0;
+      }
+      .logo-small {
+        max-width: 160px;
+        height: auto;
+      }
+      footer {
+        flex-shrink: 0;
+        background-color: #163f61;
+        color: #f1f1f1;
+        padding: 20px 45px;
+        font-size: 14px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+      }
+      footer .imagem, footer .diretrizes, footer .github {
+        flex: 1 1 200px;
+        margin-bottom: 15px;
+      }
+      footer .imagem img {
+        width: 160px;
+        margin-right: 10px;
+        margin-top: 10px;
+      }
+      footer .diretrizes a, footer .github a {
+        color: #f1f1f1;
+        font-size: 16px;
+        text-decoration: underline;
+      }
+      footer .github img {
+        width: 40px;
+        margin-bottom: 5px;
+      }
+    </style>
+  </head>
+  <body class="bg-light">
+    <button class="btn btn-outline-dark btn-sm btn-contrast-toggle" onclick="toggleContrast()" aria-label="Ativar ou desativar contraste">
+      🔳 Contraste
+    </button>
+
+    <header>
+      <img src="{{ url_for('static', filename='_avaliacao-de-acessibilidade-digital.png') }}" alt="Logotipo Avaliação de Acessibilidade Digital" class="img-fluid" />
+    </header>
+
+    <main class="container py-4">
+      <ul class="nav nav-tabs" id="mainTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="upload-tab" data-bs-toggle="tab" data-bs-target="#upload" type="button" role="tab" aria-controls="upload" aria-selected="false">
+            📁 Enviar arquivo
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="metricas-tab" data-bs-toggle="tab" data-bs-target="#metricas" type="button" role="tab" aria-controls="metricas" aria-selected="true">
+            📈 Obter Métricas
+          </button>
+        </li>
+      </ul>
+
+      <div class="tab-content" id="mainTabsContent">
+        <div class="tab-pane fade" id="upload" role="tabpanel" aria-labelledby="upload-tab">
+          <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+              <label for="file" class="form-label">Selecione um arquivo para análise:</label>
+              <input type="file" class="form-control" id="file" name="file" required accept=".html,.txt,.png,.jpg,.jpeg" />
+              <div class="form-text">Aceita arquivos .html, .txt, .png ou .jpg.</div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">♿ Avaliar Acessibilidade</button>
+          </form>
+        </div>
+
+        <div class="tab-pane fade show active" id="metricas" role="tabpanel" aria-labelledby="metricas-tab">
+          <div class="d-flex align-items-center justify-content-between gap-2 mb-4">
+  <div>
+    <h5>Filtrar por Deficiência:</h5>
+    <div class="btn-group" role="group" aria-label="Filtros por deficiência">
+      <button class="btn btn-primary" onclick="filtrar('deficiencia', '')">Todos</button>
+      <button class="btn btn-secondary" onclick="filtrar('deficiencia', 'Auditiva')">Auditiva</button>
+      <button class="btn btn-secondary" onclick="filtrar('deficiencia', 'Visual')">Visual</button>
+      <button class="btn btn-secondary" onclick="filtrar('deficiencia', 'Motora')">Motora</button>
+      <button class="btn btn-secondary" onclick="filtrar('deficiencia', 'Cognitiva')">Cognitiva</button>
+    </div>
+  </div>
+  <div>
+    <h5>Filtrar por Severidade:</h5>
+    <div class="btn-group" role="group" aria-label="Filtros por severidade">
+      <button class="btn btn-primary" onclick="filtrar('severidade', '')">Todos</button>
+      <button class="btn btn-danger" onclick="filtrar('severidade', 'Alta')">Alta</button>
+      <button class="btn btn-warning" onclick="filtrar('severidade', 'Média')">Média</button>
+      <button class="btn btn-success" onclick="filtrar('severidade', 'Baixa')">Baixa</button>
+    </div>
+  </div>
+</div>
+<div class="form-check form-switch mb-4">
+  <input class="form-check-input" type="checkbox" role="switch" id="layoutToggle" onchange="alternarLayout()">
+  <label class="form-check-label" for="layoutToggle">Empilhar gráficos verticalmente</label>
+</div>
+
+  <div class="w-100">
+    <h4>Severidade Média por Regra Avaliada</h4>
+    <canvas id="graficoSeveridade"></canvas>
+  </div>
+  <div class="w-100">
+    <h4>Ocorrências por Tipo de Deficiência</h4>
+    <canvas id="graficoDeficiencia"></canvas>
+  </div>
+</div>
+<div class="table-responsive mt-4">
+  <table class="table table-bordered table-striped align-middle shadow-sm" id="tabelaMetricas">
+    <thead class="table-light">
+      <tr>
+        <th>Descrição da Barreira</th>
+        <th>Deficiência Impactada</th>
+        <th>Tipo de Deficiência Impactada</th>
+        <th>Severidade</th>
+        <th>Sugestão de Correção</th>
+        <th>Fonte da Norma</th>
+        <th>Regra Avaliada</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for barreira in metricas %}
+      <tr>
+        <td>{{ barreira['Descrição da Barreira'] }}</td>
+        <td>{{ barreira['Deficiência Impactada'] }}</td>
+        <td>{{ barreira['Tipo de Deficiência Impactada'] }}</td>
+        <td>{{ barreira['Severidade'] }}</td>
+        <td>{{ barreira['Sugestão de Correção'] }}</td>
+        <td>{{ barreira['Fonte da Norma'] }}</td>
+        <td>{{ barreira['Regra Avaliada'] }}</td>
+        <td>{{ barreira['Status'] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="imagem">
+        <p><b>Projeto acadêmico em desenvolvimento.</b><br />Realizado com os incentivos de:</p>
+        <div>
+          <img src="https://hackathonunicesumar.com.br/_assets/media/e4ce6eacf45ee0739892753a88075a7f.png" alt="Logo da UniCesumar" />
+          <img src="https://hackathonunicesumar.com.br/_assets/media/13548fb8c9f6fa48d68e1cd6cff1f047.png" alt="Logo do Hackathon com Google Cloud" />
+        </div>
+      </div>
+      <div class="diretrizes">
+        <p>Baseado nas diretrizes de Acessibilidade:</p>
+        <p><b><a href="https://www.w3.org/WAI/standards-guidelines/wcag/" target="_blank">WCAG</a> & <a href="https://emag.governoeletronico.gov.br/" target="_blank">eMAG</a></b></p>
+      </div>
+      <div class="github">
+        <img src="https://img.icons8.com/ios11/512/FFFFFF/github.png" alt="Logo GitHub" />
+        <p>Repositório no <a href="https://github.com/seudominio/seu-projeto" target="_blank"><b>GitHub</b></a></p>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      function toggleContrast() {
+        document.body.classList.toggle("high-contrast");
+      }
+    </script>
+  <script>
+const dados = {{ metricas | default([]) | tojson | safe }};
+let filtroDeficiencia = "";
+let filtroSeveridade = "";
+let graficoSeveridade;
+let graficoDeficiencia;
+
+function filtrar(tipo, valor) {
+  if (tipo === "deficiencia") filtroDeficiencia = valor;
+  if (tipo === "severidade") filtroSeveridade = valor;
+
+  const linhas = document.querySelectorAll("#tabelaMetricas tbody tr");
+  linhas.forEach((linha) => {
+    const deficiencia = linha.cells[2].textContent;
+    const severidade = linha.cells[3].textContent;
+    const condDef = !filtroDeficiencia || deficiencia.includes(filtroDeficiencia);
+    const condSev = !filtroSeveridade || severidade === filtroSeveridade;
+    linha.style.display = condDef && condSev ? "" : "none";
+  });
+
+  atualizarGraficos();
+}
+
+function atualizarGraficos() {
+  const filtrados = dados.filter((item) => {
+    const condDef = !filtroDeficiencia || item["Tipo de Deficiência Impactada"].includes(filtroDeficiencia);
+    const condSev = !filtroSeveridade || item["Severidade"] === filtroSeveridade;
+    return condDef && condSev;
+  });
+
+  const severidades = {};
+  filtrados.forEach((item) => {
+    const tela = item["Regra Avaliada"];
+    const sev = item["Severidade"] === "Alta" ? 3 : item["Severidade"] === "Média" ? 2 : item["Severidade"] === "Baixa" ? 1 : 0;
+    if (!severidades[tela]) severidades[tela] = { total: 0, qtd: 0 };
+    severidades[tela].total += sev;
+    severidades[tela].qtd += 1;
+  });
+
+  const labels = Object.keys(severidades);
+  const medias = labels.map((tela) => (severidades[tela].total / severidades[tela].qtd).toFixed(2));
+
+  graficoSeveridade.data.labels = labels;
+  graficoSeveridade.data.datasets[0].data = medias;
+  graficoSeveridade.update();
+
+  const contagemDef = {};
+  filtrados.forEach((item) => {
+    const tipo = item["Tipo de Deficiência Impactada"];
+    if (tipo) contagemDef[tipo] = (contagemDef[tipo] || 0) + 1;
+  });
+
+  const labelsDef = Object.keys(contagemDef);
+  const valoresDef = labelsDef.map((tipo) => contagemDef[tipo]);
+
+  graficoDeficiencia.data.labels = labelsDef;
+  graficoDeficiencia.data.datasets[0].data = valoresDef;
+  graficoDeficiencia.update();
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  const severidades = {};
+  dados.forEach((item) => {
+    const tela = item["Regra Avaliada"];
+    const sev = item["Severidade"] === "Alta" ? 3 : item["Severidade"] === "Média" ? 2 : item["Severidade"] === "Baixa" ? 1 : 0;
+    if (!severidades[tela]) severidades[tela] = { total: 0, qtd: 0 };
+    severidades[tela].total += sev;
+    severidades[tela].qtd += 1;
+  });
+
+  const labels = Object.keys(severidades);
+  const medias = labels.map((tela) => (severidades[tela].total / severidades[tela].qtd).toFixed(2));
+
+  graficoSeveridade = new Chart(document.getElementById("graficoSeveridade"), {
+    type: "bar",
+    data: {
+      labels: labels,
+      datasets: [{
+        label: "Severidade Média",
+        data: medias,
+        backgroundColor: "rgba(54, 162, 235, 0.7)",
+        borderColor: "rgba(54, 162, 235, 1)",
+        borderWidth: 1,
+      }],
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: "Severidade (1=Baixa, 2=Média, 3=Alta)",
+          },
+        },
+      },
+    },
+  });
+
+  const contagemDef = {};
+  dados.forEach((item) => {
+    const tipo = item["Tipo de Deficiência Impactada"];
+    if (tipo) contagemDef[tipo] = (contagemDef[tipo] || 0) + 1;
+  });
+
+  const labelsDef = Object.keys(contagemDef);
+  const valoresDef = labelsDef.map((tipo) => contagemDef[tipo]);
+
+  graficoDeficiencia = new Chart(document.getElementById("graficoDeficiencia"), {
+    type: "bar",
+    data: {
+      labels: labelsDef,
+      datasets: [{
+        label: "Ocorrências",
+        data: valoresDef,
+        backgroundColor: "rgba(255, 99, 132, 0.7)",
+        borderColor: "rgba(255, 99, 132, 1)",
+        borderWidth: 1,
+      }],
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: "Número de Ocorrências",
+          },
+          ticks: { precision: 0 },
+        },
+      },
+    },
+  });
+});
+
+function alternarLayout() {
+  const container = document.querySelector('.graficos-container');
+  if (!container) return;
+  const isVertical = document.getElementById('layoutToggle').checked;
+  container.style.flexDirection = isVertical ? 'column' : 'row';
+}
+</script>
+
+
+</html>

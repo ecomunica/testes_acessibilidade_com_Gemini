@@ -1,0 +1,9 @@
+flask
+google-generativeai
+werkzeug
+jira
+dotenv
+google-auth
+google-auth-oauthlib
+google-api-python-client
+google-generativeai
