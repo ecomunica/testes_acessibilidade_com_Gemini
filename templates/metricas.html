@@ -90,10 +90,10 @@
         height: auto;
       }
       footer {
-        flex-shrink: 0;
         background-color: #163f61;
-        color: #f1f1f1;
+        width: 100%;
         padding: 20px 45px;
+        color: #f1f1f1;
         font-size: 14px;
         display: flex;
         flex-wrap: wrap;
@@ -103,7 +103,14 @@
       footer .imagem,
       footer .diretrizes,
       footer .github {
-        flex: 1 1 200px;
+        margin-bottom: 15px;
+      }
+
+      footer .diretrizes,
+      footer .github {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         margin-bottom: 15px;
       }
       footer .imagem img {
