@@ -1,130 +1,180 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Resultado da Análise</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <style>
-      html, body {
-        height: 100%;
-        margin: 0;
-      }
-
-      body {
-        display: flex;
-        flex-direction: column;
-      }
-
-      main {
-        flex: 1 0 auto;
-      }
-      
-      .table-responsive {
-        width: 100%;
-        margin: 0 auto;
-      }
-           
-	  th {
-		white-space: nowrap;
-	  }
-
-      .logo-small {
-        max-width: 160px;
-        height: auto;
-      }
-
-      .btn-contrast-toggle {
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
-      }
-
-      .bg-azul {
-        background-color: #205d8d;
-        color: #fff;
-      }
-
-      .bg-azul:hover {
-        background-color: #163f61 !important;
-        color: #fff !important;
-      }
-
-      .pre-bruta {
-        white-space: pre-wrap;
-        background-color: #f1f1f1;
-        padding: 1rem;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-      }
-
+<head>
+  <meta charset="UTF-8" />
+  <title>Resultado da Análise</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="icon" href="../static/_avaliacao-de-acessibilidade-digital.HT.PNG" type="image/png" />
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      background-color: #345e88;
+      color: #000;
+    }
+    body.high-contrast {
+      background-color: #333333 !important;
+      color: #fff !important;
+    }
+    .high-contrast .btn,
+    .high-contrast .form-control,
+    .high-contrast input,
+    .high-contrast textarea,
+    .high-contrast select {
+      background-color: #333333 !important;
+      color: #f1f1f1 !important;
+      border-color: #f1f1f1 !important;
+    }
+    .high-contrast ::placeholder {
+      color: #cccccc !important;
+    }
+    .high-contrast .form-text {
+      color: #bfbfbf !important;
+    }
+    .high-contrast .form-control:focus,
+    .high-contrast .btn:focus {
+      outline: 2px solid #000 !important;
+      outline-offset: 2px;
+      box-shadow: none !important;
+    }
+    .high-contrast .nav-link.active {
+      background-color: #444444 !important;
+      color: #ffffff !important;
+      border-color: #f1f1f1 #f1f1f1 #333333 !important;
+    }
+    .high-contrast .container,
+    .high-contrast .tab-pane {
+      background-color: #2b2b2b !important;
+      color: #ffffff !important;
+    }
+    .logo-small {
+      max-width: 160px;
+      height: auto;
+    }
+    .btn-contrast-toggle {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+    }
+    .bg-home-light {
+      background-color: #d0e5f7 !important;
+      color: #000 !important;
+    }
+    .bg-azul {
+      background-color: #205d8d;
+      color: #fff;
+    }
+    .bg-azul:hover {
+      background-color: #163f61 !important;
+      color: #fff !important;
+    }
+    .pre-bruta {
+      white-space: pre-wrap;
+      background-color: #f1f1f1;
+      padding: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    header {
+      background-color: #163f61;
+      padding: 1rem;
+      text-align: center;
+    }
+    header img {
+      max-width: 100%;
+      height: auto;
+    }
+    footer {
+      background-color: #163f61;
+      width: 100%;
+      padding: 20px 45px;
+      color: #f1f1f1;
+      font-size: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+    }
+    footer .imagem,
+    footer .diretrizes,
+    footer .github {
+      margin-bottom: 15px;
+    }
+    footer .diretrizes,
+    footer .github {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    footer .imagem img {
+      width: 160px;
+      margin-right: 10px;
+      margin-top: 10px;
+    }
+    footer .diretrizes a,
+    footer .github a {
+      color: #f1f1f1;
+      font-size: 16px;
+      text-decoration: underline;
+    }
+    footer .github img {
+      width: 40px;
+      margin-bottom: 5px;
+    }
+    @media (max-width: 768px) {
       footer {
-        flex-shrink: 0;
-        background-color: #163f61;
-        color: #f1f1f1;
-        padding: 20px 45px;
-        font-size: 14px;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        align-items: center;
+        flex-direction: column;
+        text-align: center;
       }
-
-      footer .imagem,
-      footer .diretrizes,
-      footer .github {
-        flex: 1 1 200px;
-        margin-bottom: 15px;
-      }
-
-      footer .imagem img {
-        width: 160px;
-        margin-right: 10px;
-        margin-top: 10px;
-      }
-
-      footer .diretrizes a,
-      footer .github a {
-        color: #f1f1f1;
-        font-size: 16px;
-        text-decoration: underline;
-      }
-
-      footer .github img {
-        width: 40px;
-        margin-bottom: 5px;
-      }
-
-      @media (max-width: 768px) {
-        footer {
-          flex-direction: column;
-          text-align: center;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <button
-      class="btn btn-outline-dark btn-sm btn-contrast-toggle"
-      onclick="toggleContrast()"
-      aria-label="Ativar ou desativar contraste"
-    >
-      🔳 Modo escuro
+    }
+  </style>
+</head>
+<body class="bg-home-light">
+  <button class="btn btn-outline-dark btn-sm btn-contrast-toggle" onclick="toggleContrast()" aria-label="Ativar ou desativar contraste">🔳 Modo escuro</button>
+  <header>
+    <img src="{{ url_for('static', filename='_avaliacao-de-acessibilidade-digital.png') }}" alt="Logotipo Avaliação de Acessibilidade Digital" class="img-fluid" />
+  </header>
+  <main class="container py-4">
+    <ul class="nav nav-tabs" id="mainTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="upload-tab" data-bs-toggle="tab" data-bs-target="#upload" type="button" role="tab" aria-controls="upload" aria-selected="false">
+          📁 Enviar arquivo
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="avaliacao-tab" data-bs-toggle="tab" data-bs-target="#avaliacao" type="button" role="tab" aria-controls="avaliacao" aria-selected="true">
+          📋 Avaliação de Acessibilidade
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+    <button class="nav-link" id="metricas-tab" data-bs-toggle="tab" data-bs-target="#metricas" type="button" role="tab" aria-controls="metricas" aria-selected="false">
+      📈 Obter Métricas
     </button>
-
-    <main class="container py-4">
-      <div class="d-flex align-items-center mb-3">
-        <img
-          src="{{ url_for('static', filename='_avaliacao-de-acessibilidade-digital.png') }}"
-          alt="Logo Acessibilidade Digital"
-          class="logo-small me-3"
-        />
-        <h2 class="mb-0">📋 Resultado da Análise</h2>
+  </li>
+</ul>
+<div class="tab-content" id="mainTabsContent">
+  <div class="tab-pane fade" id="upload" role="tabpanel" aria-labelledby="upload-tab">
+    <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data" aria-label="Formulário para envio de arquivos para análise de acessibilidade">
+      <div class="mb-3">
+        <label for="file" class="form-label">Selecione um arquivo para análise:</label>
+        <input type="file" class="form-control" id="file" name="file" required aria-describedby="fileHelp" accept=".html,.txt,.png,.jpg,.jpeg" />
+        <div id="fileHelp" class="form-text text-muted">Aceita arquivos .html, .txt, .png ou .jpg. O conteúdo será analisado automaticamente.</div>
       </div>
+      <button type="submit" class="btn bg-azul w-100" aria-label="Enviar para análise de acessibilidade">♿ Avaliar Acessibilidade</button>
+    </form>
+  </div>
 
+    <div class="tab-content" id="mainTabsContent">
+      <div class="tab-pane fade show active" id="avaliacao" role="tabpanel" aria-labelledby="avaliacao-tab">
+    <div class="d-flex align-items-center mb-3">
+      <h2 class="mb-0">📋 Resultado da Análise</h2>
+    </div>
       {% with messages = get_flashed_messages() %}
       {% if messages %}
       <div class="alert alert-info" role="alert">
@@ -134,7 +184,6 @@
       </div>
       {% endif %}
       {% endwith %}
-
       {% if barreiras %}
       <div class="table-responsive">
         <table class="table table-bordered table-striped align-middle shadow-sm">
@@ -177,51 +226,41 @@
         </table>
       </div>
       {% else %}
-      <div class="alert alert-secondary text-center">
-        Nenhuma barreira foi identificada.
-      </div>
+      <div class="alert alert-secondary text-center">Nenhuma barreira foi identificada.</div>
       {% endif %}
-
       <div class="text-center mt-4">
         <a href="{{ url_for('index') }}" class="btn bg-azul">⬅ Voltar</a>
       </div>
-    </main>
-
-    <footer>
-      <div class="imagem">
-        <p>
-          <b>Projeto acadêmico em desenvolvimento.</b><br />
-          Realizado com os incentivos de:
-        </p>
-        <div>
-          <img src="https://hackathonunicesumar.com.br/_assets/media/e4ce6eacf45ee0739892753a88075a7f.png" alt="Logo 1" />
-          <img src="https://hackathonunicesumar.com.br/_assets/media/13548fb8c9f6fa48d68e1cd6cff1f047.png" alt="Logo 2" />
-        </div>
+          </div>
+      <div class="tab-pane fade" id="metricas" role="tabpanel" aria-labelledby="metricas-tab">
+        <form action="{{ url_for('metricas') }}" method="POST">
+          <button class="btn bg-azul w-100" type="submit">📈 Ver Métricas de Barreiras</button>
+        </form>
       </div>
-      <div class="diretrizes">
-        <p>Baseado nas diretrizes de Acessibilidade:</p>
-        <p>
-          <b>
-            <a href="https://www.w3.org/WAI/standards-guidelines/wcag/" target="_blank">WCAG</a>
-            &
-            <a href="https://emag.governoeletronico.gov.br/" target="_blank">eMAG</a>
-          </b>
-        </p>
+    </div>
+  </main>
+  <footer>
+    <div class="imagem">
+      <p><b>Projeto acadêmico em desenvolvimento.</b><br />Realizado com os incentivos de:</p>
+      <div>
+        <img src="https://hackathonunicesumar.com.br/_assets/media/e4ce6eacf45ee0739892753a88075a7f.png" alt="Logo 1" />
+        <img src="https://hackathonunicesumar.com.br/_assets/media/13548fb8c9f6fa48d68e1cd6cff1f047.png" alt="Logo 2" />
       </div>
-      <div class="github">
-        <img src="https://img.icons8.com/ios11/512/FFFFFF/github.png" alt="GitHub" />
-        <p>
-          Repositório no
-          <a href="https://github.com/seudominio/seu-projeto" target="_blank"><b>GitHub</b></a>
-        </p>
-      </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-      function toggleContrast() {
-        document.body.classList.toggle("high-contrast");
-      }
-    </script>
-  </body>
+    </div>
+    <div class="diretrizes">
+      <p>Baseado nas diretrizes de Acessibilidade:</p>
+      <p><b><a href="https://www.w3.org/WAI/standards-guidelines/wcag/" target="_blank">WCAG</a> & <a href="https://emag.governoeletronico.gov.br/" target="_blank">eMAG</a></b></p>
+    </div>
+    <div class="github">
+      <img src="https://img.icons8.com/ios11/512/FFFFFF/github.png" alt="GitHub" />
+      <p>Repositório no <a href="https://github.com/seudominio/seu-projeto" target="_blank"><b>GitHub</b></a></p>
+    </div>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function toggleContrast() {
+      document.body.classList.toggle("high-contrast");
+    }
+  </script>
+</body>
 </html>
