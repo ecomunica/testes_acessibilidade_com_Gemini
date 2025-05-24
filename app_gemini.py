@@ -242,7 +242,7 @@ def metricas():
         sheets_service = obter_sheets_service()
         resultado = sheets_service.spreadsheets().values().get(
             spreadsheetId=ID_PLANILHA_GSHEETS,
-            range="Barreiras!A1:H"
+            range="Barreiras!A1:I"
         ).execute()
 
         valores = resultado.get('values', [])
