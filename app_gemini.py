@@ -1,11 +1,13 @@
 from flask import Flask, request, render_template, redirect, url_for, flash
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
+from flask import send_from_directory
 
 import os
 import ast
 import google.generativeai as genai
 import logging
+import io
 
 from gsheets_service import obter_sheets_service, ID_PLANILHA_GSHEETS, TIPO_ENTRADA_GSHEETS, TIPO_DADO_GSHEETS
 from jira_service import campoNorma, campoSeveridade, campoDescricao, campoDeficiencia, campoFonte, campoStatus, campoSugestaoCorrecao, obter_jira_service
@@ -188,13 +190,52 @@ def upload():
                 flash(f"❌ Erro ao registrar barreiras no Google Sheets: {e.args}")
         except Exception as e:
             flash(f"❌ Erro ao registrar em planilhas ou Jira: {e}")
-
-        return render_template('resultado.html', barreiras=barreiras)
+        fileme = os.path.basename(filepath)
+        return render_template('resultado.html', barreiras=barreiras,filepath=filepath,filename=filename)
 
     except Exception as e:
         flash(f"Erro com a IA: {e}")
         return redirect(url_for('index'))
+    
+@app.route('/corrigir', methods=['POST'])
+def corrigir():
+    nome_arquivo = request.form.get('filename')
 
+    if not nome_arquivo:
+        flash("Nome do arquivo não enviado.")
+        return redirect(url_for('index'))
+
+    caminho_arquivo = os.path.join(app.config['UPLOAD_FOLDER'], nome_arquivo)
+
+    if not os.path.exists(caminho_arquivo):
+        flash("Arquivo original não encontrado.")
+        return redirect(url_for('index'))
+    
+    with open(caminho_arquivo, 'r', encoding='utf-8') as f:
+        conteudo_html = f.read()
+
+    prompt = construir_prompt_correcao(conteudo_html)
+        
+    try:
+        model = genai.GenerativeModel("models/gemini-1.5-flash")
+        response = model.generate_content([prompt])
+        codigo_corrigido = response.text.strip()
+
+        if codigo_corrigido.startswith("```html"):
+            codigo_corrigido = codigo_corrigido.replace("```html", "").replace("```", "").strip()
+
+        nome_corrigido = f"corrigido_{os.path.basename(caminho_arquivo)}"
+        caminho_corrigido = os.path.join(app.config['UPLOAD_FOLDER'], nome_corrigido)
+
+        with open(caminho_corrigido, 'w', encoding='utf-8') as f:
+            f.write(codigo_corrigido)
+
+        return redirect(url_for('download', filename=nome_corrigido))
+
+    except Exception as e:
+        flash(f"Erro ao corrigir HTML com IA: {e}")
+        return redirect(url_for('index'))
+    
 @app.route('/feedback', methods=['POST'])
 def feedback():
     id_barreira = request.form.get('id_barreira')
@@ -235,6 +276,10 @@ def feedback():
 
     flash(f"Feedback enviado para barreira {id_barreira} - {descricao}: {status}")
     return '', 204
+
+@app.route('/download/<filename>')
+def download(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
 
 @app.route('/metricas', methods=['POST'])
 def metricas():
@@ -358,6 +403,20 @@ A resposta final deve ser uma lista JSON pura com objetos, cada um contendo os s
 - "Fonte da Norma"
 
 Conteúdo a ser analisado:
+{content}
+"""
+
+def construir_prompt_correcao(content):
+    return f"""
+    Você é um especialista em acessibilidade digital. Corrija o seguinte código HTML com base nas diretrizes WCAG 2.1 (níveis A e AA) e eMAG 3.1.
+
+Seu objetivo é:
+- Corrigir todas as barreiras de acessibilidade.
+- Comentar no código o que foi alterado (com <!-- Comentário -->).
+- Manter a estrutura geral do HTML.
+- Não incluir explicações fora do código. Retorne apenas o código HTML corrigido.
+
+Código original:
 {content}
 """
 

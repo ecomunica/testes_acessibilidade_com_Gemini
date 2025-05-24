@@ -228,6 +228,16 @@
       {% else %}
       <div class="alert alert-secondary text-center">Nenhuma barreira foi identificada.</div>
       {% endif %}
+
+      {% if barreiras %}
+      <div class="text-center mt-3">
+        <form action="{{ url_for('corrigir') }}" method="post">
+          <input type="hidden" name="filename" value="{{ filename }}">
+          <button type="submit" class="btn btn-success">🛠️ Corrigir e Baixar Código</button>
+        </form>
+      </div>
+      {% endif %}
+
       <div class="text-center mt-4">
         <a href="{{ url_for('index') }}" class="btn bg-azul">⬅ Voltar</a>
       </div>
