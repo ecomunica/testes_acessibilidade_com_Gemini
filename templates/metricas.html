@@ -208,6 +208,11 @@
         border-radius: 8px;
         overflow: hidden;
       }
+      .graficos-container .flex-fill canvas {
+        width: 100% !important;
+        height: 100% !important;
+        }
+
     </style>
   </head>
   <body class="bg-home-light">
@@ -260,29 +265,11 @@
       </ul>
 
       <div class="tab-content" id="mainTabsContent">
-        <div
-          class="tab-pane fade"
-          id="upload"
-          role="tabpanel"
-          aria-labelledby="upload-tab"
-        >
-          <form
-            action="{{ url_for('upload') }}"
-            method="POST"
-            enctype="multipart/form-data"
-          >
+        <div class="tab-pane fade" id="upload" role="tabpanel" aria-labelledby="upload-tab" >
+          <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data" >
             <div class="mb-3">
-              <label for="file" class="form-label"
-                >Selecione um arquivo para análise:</label
-              >
-              <input
-                type="file"
-                class="form-control"
-                id="file"
-                name="file"
-                required
-                accept=".html,.txt,.png,.jpg,.jpeg"
-              />
+              <label for="file" class="form-label" >Selecione um arquivo para análise:</label >
+              <input type="file" class="form-control" id="file" name="file" required accept=".html,.txt,.png,.jpg,.jpeg" />
               <div class="form-text">
                 Aceita arquivos .html, .txt, .png ou .jpg.
               </div>
@@ -293,149 +280,84 @@
           </form>
         </div>
 
-        <div
-          class="tab-pane fade show active"
-          id="metricas"
-          role="tabpanel"
-          aria-labelledby="metricas-tab"
-        >
-          <div
-            class="d-flex align-items-center justify-content-between gap-2 mb-4"
-          >
+        <div class="tab-pane fade show active" id="metricas" ole="tabpanel" aria-labelledby="metricas-tab">
+
+          <!-- Switch do layout -->
+          <div class="form-check form-switch mb-4">
+            <input class="form-check-input" type="checkbox" role="switch" id="layoutToggle" />
+            <label class="form-check-label" for="layoutToggle"> Exibir gráficos lado a lado </label>
+          </div>
+
+          <!-- Filtros -->
+          <div class="d-flex flex-wrap gap-4 mb-4">
             <div>
               <h5>Filtrar por Severidade:</h5>
-              <div
-                class="btn-group"
-                role="group"
-                aria-label="Filtros por severidade"
-              >
-                <button
-                  class="btn btn-primary"
-                  onclick="filtrar('severidade', '')"
-                >
-                  Todos
-                </button>
-                <button
-                  class="btn btn-danger"
-                  onclick="filtrar('severidade', 'Alta')"
-                >
-                  Alta
-                </button>
-                <button
-                  class="btn btn-warning"
-                  onclick="filtrar('severidade', 'Média')"
-                >
-                  Média
-                </button>
-                <button
-                  class="btn btn-success"
-                  onclick="filtrar('severidade', 'Baixa')"
-                >
-                  Baixa
-                </button>
+              <div class="btn-group" role="group" aria-label="Filtros por severidade">
+                <button class="btn btn-primary" onclick="filtrar('severidade', '')">Todos</button>
+                <button class="btn btn-danger" onclick="filtrar('severidade', 'Alta')">Alta</button>
+                <button class="btn btn-warning" onclick="filtrar('severidade', 'Média')">Média</button>
+                <button class="btn btn-success" onclick="filtrar('severidade', 'Baixa')">Baixa</button>
+              </div>
+            </div>
+            <div>
+              <h5>Filtrar por Deficiência:</h5>
+              <div class="btn-group" role="group" aria-label="Filtros por deficiência">
+                <button class="btn btn-primary" onclick="filtrar('deficiencia', '')">Todos</button>
+                <button class="btn btn-secondary" onclick="filtrar('deficiencia', 'Auditiva')">Auditiva</button>
+                <button class="btn btn-secondary" onclick="filtrar('deficiencia', 'Visual')">Visual</button>
+                <button class="btn btn-secondary" onclick="filtrar('deficiencia', 'Motora')">Motora</button>
+                <button class="btn btn-secondary" onclick="filtrar('deficiencia', 'Cognitiva')">Cognitiva</button>
               </div>
             </div>
           </div>
-          <div class="form-check form-switch mb-4">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              role="switch"
-              id="layoutToggle"
-              onchange="alternarLayout()"
-            />
-            <label class="form-check-label" for="layoutToggle"
-              >Empilhar gráficos verticalmente</label
-            >
-          </div>
-
-          <div class="w-100">
-            <h4>Severidade Média por Regra Avaliada</h4>
-            <canvas id="graficoSeveridade"></canvas>
-          </div>
-
-          <div>
-            <h5 style="margin-top: 45px">Filtrar por Deficiência:</h5>
-            <div
-              class="btn-group"
-              role="group"
-              aria-label="Filtros por deficiência"
-            >
-              <button
-                class="btn btn-primary"
-                onclick="filtrar('deficiencia', '')"
-              >
-                Todos
-              </button>
-              <button
-                class="btn btn-secondary"
-                onclick="filtrar('deficiencia', 'Auditiva')"
-              >
-                Auditiva
-              </button>
-              <button
-                class="btn btn-secondary"
-                onclick="filtrar('deficiencia', 'Visual')"
-              >
-                Visual
-              </button>
-              <button
-                class="btn btn-secondary"
-                onclick="filtrar('deficiencia', 'Motora')"
-              >
-                Motora
-              </button>
-              <button
-                class="btn btn-secondary"
-                onclick="filtrar('deficiencia', 'Cognitiva')"
-              >
-                Cognitiva
-              </button>
+          
+          <!-- Container flexível dos gráficos -->
+          <div class="graficos-container d-flex flex-column gap-4">
+            <div class="flex-fill" style="height: 400px;">
+              <h4>Severidade Média por Regra Avaliada</h4>
+              <canvas id="graficoSeveridade"></canvas>
+            </div>
+            <div class="flex-fill" style="height: 400px;">
+              <h4>Ocorrências por Tipo de Deficiência</h4>
+              <canvas id="graficoDeficiencia"></canvas>
             </div>
           </div>
 
-          <div class="w-100">
-            <h4 style="margin-top: 45px">
-              Ocorrências por Tipo de Deficiência
-            </h4>
-            <canvas id="graficoDeficiencia"></canvas>
+          <!-- Tabela de métricas -->
+          <div class="table-responsive mt-4">
+            <table class="table table-bordered table-striped align-middle shadow-sm" id="tabelaMetricas">
+              <thead class="table-light">
+                <tr>
+                  <th>Descrição da Barreira</th>
+                  <th>Deficiência Impactada</th>
+                  <th>Tipo de Deficiência Impactada</th>
+                  <th>Severidade</th>
+                  <th>Sugestão de Correção</th>
+                  <th>Fonte da Norma</th>
+                  <th>Regra Avaliada</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for barreira in metricas %}
+                <tr>
+                  <td>{{ barreira['Descrição da Barreira'] }}</td>
+                  <td>{{ barreira['Deficiência Impactada'] }}</td>
+                  <td>{{ barreira['Tipo de Deficiência Impactada'] }}</td>
+                  <td>{{ barreira['Severidade'] }}</td>
+                  <td>{{ barreira['Sugestão de Correção'] }}</td>
+                  <td>{{ barreira['Fonte da Norma'] }}</td>
+                  <td>{{ barreira['Regra Avaliada'] }}</td>
+                  <td>{{ barreira['Status'] }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
           </div>
-        </div>
-        <div class="table-responsive mt-4">
-          <table
-            class="table table-bordered table-striped align-middle shadow-sm"
-            id="tabelaMetricas"
-          >
-            <thead class="table-light">
-              <tr>
-                <th>Descrição da Barreira</th>
-                <th>Deficiência Impactada</th>
-                <th>Tipo de Deficiência Impactada</th>
-                <th>Severidade</th>
-                <th>Sugestão de Correção</th>
-                <th>Fonte da Norma</th>
-                <th>Regra Avaliada</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for barreira in metricas %}
-              <tr>
-                <td>{{ barreira['Descrição da Barreira'] }}</td>
-                <td>{{ barreira['Deficiência Impactada'] }}</td>
-                <td>{{ barreira['Tipo de Deficiência Impactada'] }}</td>
-                <td>{{ barreira['Severidade'] }}</td>
-                <td>{{ barreira['Sugestão de Correção'] }}</td>
-                <td>{{ barreira['Fonte da Norma'] }}</td>
-                <td>{{ barreira['Regra Avaliada'] }}</td>
-                <td>{{ barreira['Status'] }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
         </div>
       </div>
     </main>
+
 
     <footer>
       <div class="imagem">
@@ -590,6 +512,7 @@
           },
           options: {
             responsive: true,
+            maintainAspectRatio: false,    // <— aqui
             scales: {
               y: {
                 beginAtZero: true,
@@ -625,6 +548,7 @@
           },
           options: {
             responsive: true,
+            maintainAspectRatio: false,
             scales: {
               y: {
                 beginAtZero: true,
@@ -639,12 +563,33 @@
         });
       });
 
-      function alternarLayout() {
-        const container = document.querySelector('.graficos-container');
-        if (!container) return;
-        const isVertical = document.getElementById('layoutToggle').checked;
-        container.style.flexDirection = isVertical ? 'column' : 'row';
-      }
+  const toggle = document.getElementById('layoutToggle');
+  const container = document.querySelector('.graficos-container');
+
+  // Aplica o layout inicial antes de qualquer clique
+  container.classList.add(toggle.checked ? 'flex-row' : 'flex-column');
+
+  toggle.addEventListener('change', () => {
+    // Ajusta flex-direction
+    container.classList.remove('flex-row', 'flex-column');
+    container.classList.add(toggle.checked ? 'flex-row' : 'flex-column');
+
+    // Redimensiona e atualiza ambos os charts
+    if (typeof graficoSeveridade !== 'undefined') {
+      graficoSeveridade.resize();
+      graficoSeveridade.update();
+    }
+    if (typeof graficoDeficiencia !== 'undefined') {
+      graficoDeficiencia.resize();
+      graficoDeficiencia.update();
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Dispara o change uma vez para aplicar o estado inicial
+    toggle.dispatchEvent(new Event('change'));
+  });
     </script>
+
   </body>
 </html>
