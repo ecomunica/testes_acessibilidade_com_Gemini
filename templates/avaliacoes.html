@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Avaliações de Barreiras</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+      }
+
+      main {
+        flex: 1 0 auto;
+      }
+
+      .table-responsive {
+        width: 100%;
+        margin: 0 auto;
+      }
+
+      th {
+        white-space: nowrap;
+      }
+
+      .logo-small {
+        max-width: 160px;
+        height: auto;
+      }
+
+      .btn-contrast-toggle {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+      }
+
+      .bg-azul {
+        background-color: #205d8d;
+        color: #fff;
+      }
+
+      .bg-azul:hover {
+        background-color: #163f61 !important;
+        color: #fff !important;
+      }
+
+      .pre-bruta {
+        white-space: pre-wrap;
+        background-color: #f1f1f1;
+        padding: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+      }
+
+      .graficos-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+        margin-top: 2rem;
+      }
+
+      #tabelaMetricas td,
+      #tabelaMetricas th {
+        word-break: break-word;
+        white-space: normal !important;
+      }
+
+      footer {
+        flex-shrink: 0;
+        background-color: #163f61;
+        color: #f1f1f1;
+        padding: 20px 45px;
+        font-size: 14px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      footer .imagem,
+      footer .diretrizes,
+      footer .github {
+        flex: 1 1 200px;
+        margin-bottom: 15px;
+      }
+
+      footer .imagem img {
+        width: 160px;
+        margin-right: 10px;
+        margin-top: 10px;
+      }
+
+      footer .diretrizes a,
+      footer .github a {
+        color: #f1f1f1;
+        font-size: 16px;
+        text-decoration: underline;
+      }
+
+      footer .github img {
+        width: 40px;
+        margin-bottom: 5px;
+      }
+
+      @media (max-width: 768px) {
+        footer {
+          flex-direction: column;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body class="container my-4">
+    <button
+      class="btn btn-outline-dark btn-sm btn-contrast-toggle"
+      onclick="toggleContrast()"
+      aria-label="Ativar ou desativar contraste"
+    >
+      🔳 Modo escuro
+    </button>
+    <main class="container py-4">
+      <div class="d-flex align-items-center mb-3">
+        <img
+          src="{{ url_for('static', filename='_avaliacao-de-acessibilidade-digital.png') }}"
+          alt="Logo Acessibilidade Digital"
+          class="logo-small me-3"
+        />
+        <h2 class="mb-0">🔍 Avaliações de Barreiras</h2>
+      </div>
+      <div>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="alert alert-info">
+              {% for message in messages %}
+                <div>{{ message }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+      </div>
+      <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
+        <div class="gap-2 my-3">
+          <h5>Filtrar por Feedback:</h5>
+          <button class="btn btn-secondary" onclick="filtrar('status', '')">
+            Todos
+          </button>
+          <button
+            class="btn btn-primary"
+            onclick="filtrar('status', 'Correto')"
+          >
+            Correto
+          </button>
+          <button
+            class="btn btn-danger"
+            onclick="filtrar('status', 'Incorreto')"
+          >
+            Incorreto
+          </button>
+        </div>
+      </div>
+
+      {% if barreiras %}
+      <div class="table-responsive">
+        <table class="table table-bordered" id="tabelaMetricas">
+          <thead class="table-light">
+            <tr>
+              <th style="width: 20%">Descrição da Barreira</th>
+              <th style="width: 10%">Deficiência Impactada</th>
+              <th style="width: 10%">Tipo de Deficiência Impactada</th>
+              <th style="width: 8%">Severidade</th>
+              <th style="width: 20%">Sugestão de Correção</th>
+              <th style="width: 10%">Fonte da Norma</th>
+              <th style="width: 15%">Regra Avaliada</th>
+              <th style="width: 7%">Status</th>
+              <th style="width: 5%">Feedback</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for barreira in barreiras %}
+            <tr>
+              <td>{{ barreira['Descrição da Barreira'] }}</td>
+              <td>{{ barreira['Deficiência Impactada'] }}</td>
+              <td>{{ barreira['Tipo de Deficiência Impactada'] }}</td>
+              <td>{{ barreira['Severidade'] }}</td>
+              <td>{{ barreira['Sugestão de Correção'] }}</td>
+              <td>{{ barreira['Fonte da Norma'] }}</td>
+              <td>{{ barreira['Regra Avaliada'] }}</td>
+              <td>{{ barreira['Status'] }}</td>
+              <td>
+                <form action="{{ url_for('avaliacoes') }}" method="POST" class="d-flex gap-2">
+                  <input type="hidden" name="descricao" value="{{ barreira['Descrição da Barreira'] }}">
+                  <input type="hidden" name="id_barreira" value="{{ barreira['ID Ticket Jira'] }}">
+                  <button name="status" value="Correto" class="btn btn-outline-success btn-sm" title="Confirmar como correta">✔</button>
+                  <button name="status" value="Incorreto" class="btn btn-outline-danger btn-sm" title="Marcar como incorreta">✖</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="alert alert-secondary text-center">
+        Nenhuma barreira foi identificada.
+      </div>
+      {% endif %}
+
+      <div class="text-center mt-4">
+        <a href="{{ url_for('index') }}" class="btn bg-azul">⬅ Voltar</a>
+      </div>
+
+      <script>
+        let filtroStatus = "";
+        const linhasPorPagina = 5;
+        let paginaAtual = 1;
+
+        function filtrar(tipo, valor) {
+          if (tipo === "status") {
+            filtroStatus = valor;
+            paginaAtual = 1;
+          }
+          atualizarTabela();
+        }
+
+        function atualizarTabela() {
+          const linhas = document.querySelectorAll("#tabelaMetricas tbody tr");
+          let linhasVisiveis = [];
+
+          linhas.forEach((linha) => {
+            const status = linha.cells[7].textContent.trim().toLowerCase();
+            const filtro = filtroStatus.trim().toLowerCase();
+            const condStatus = !filtro || status === filtro;
+
+            if (condStatus) {
+              linhasVisiveis.push(linha);
+            }
+            linha.style.display = "none";
+          });
+
+          const totalPaginas = Math.ceil(linhasVisiveis.length / linhasPorPagina);
+          if (paginaAtual > totalPaginas) paginaAtual = totalPaginas || 1;
+
+          const inicio = (paginaAtual - 1) * linhasPorPagina;
+          const fim = inicio + linhasPorPagina;
+
+          linhasVisiveis.slice(inicio, fim).forEach((linha) => {
+            linha.style.display = "";
+          });
+
+          renderizarPaginacao(totalPaginas);
+        }
+
+        function mudarPagina(novaPagina) {
+          paginaAtual = novaPagina;
+          atualizarTabela();
+        }
+
+        function renderizarPaginacao(totalPaginas) {
+          let paginacao = document.getElementById("paginacao");
+          if (!paginacao) {
+            paginacao = document.createElement("div");
+            paginacao.id = "paginacao";
+            paginacao.className = "mt-3 d-flex flex-wrap justify-content-center gap-2";
+            paginacao.style.padding = "10px 0";
+            document.querySelector("main").appendChild(paginacao);
+          }
+          paginacao.innerHTML = "";
+
+          for (let i = 1; i <= totalPaginas; i++) {
+            const btn = document.createElement("button");
+            btn.textContent = i;
+            btn.className = "btn btn-sm";
+            btn.style.border = "1px solid #6c757d";
+            btn.style.color = "#6c757d";
+            btn.style.backgroundColor = "transparent";
+
+            if (i === paginaAtual) {
+              btn.style.backgroundColor = "#6c757d";
+              btn.style.color = "#fff";
+            }
+
+            btn.onclick = () => mudarPagina(i);
+            paginacao.appendChild(btn);
+          }
+        }
+
+        document.addEventListener("DOMContentLoaded", atualizarTabela);
+      </script>
+
+
+    </main>
+    <footer>
+      <div class="imagem">
+        <p>
+          <b>Projeto acadêmico em desenvolvimento.</b><br />
+          Realizado com os incentivos de:
+        </p>
+        <div>
+          <img
+            src="https://hackathonunicesumar.com.br/_assets/media/e4ce6eacf45ee0739892753a88075a7f.png"
+            alt="Logo 1"
+          />
+          <img
+            src="https://hackathonunicesumar.com.br/_assets/media/13548fb8c9f6fa48d68e1cd6cff1f047.png"
+            alt="Logo 2"
+          />
+        </div>
+      </div>
+      <div class="diretrizes">
+        <p>Baseado nas diretrizes de Acessibilidade:</p>
+        <p>
+          <b>
+            <a
+              href="https://www.w3.org/WAI/standards-guidelines/wcag/"
+              target="_blank"
+              >WCAG</a
+            >
+            &
+            <a href="https://emag.governoeletronico.gov.br/" target="_blank"
+              >eMAG</a
+            >
+          </b>
+        </p>
+      </div>
+      <div class="github">
+        <img
+          src="https://img.icons8.com/ios11/512/FFFFFF/github.png"
+          alt="GitHub"
+        />
+        <p>
+          Repositório no
+          <a href="https://github.com/seudominio/seu-projeto" target="_blank"
+            ><b>GitHub</b></a
+          >
+        </p>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      function toggleContrast() {
+        document.body.classList.toggle("high-contrast");
+      }
+    </script>
+  </body>
+</html>

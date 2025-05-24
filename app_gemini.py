@@ -91,7 +91,7 @@ def upload():
                             "Severidade": b.get("Severidade", ""),
                             "Sugestão de Correção": b.get("Sugestão de Correção", ""),
                             "Fonte da Norma": b.get("Fonte da Norma", ""),
-                            "status": "Aberta"
+                            "Status": "Aberta"
                         }
                         barreiras.append(nova)
                 else:
@@ -106,7 +106,7 @@ def upload():
                     "Severidade": "Média",
                     "Sugestão de Correção": "—",
                     "Fonte da Norma": "IA",
-                    "status": "Bruto"
+                    "Status": "Bruto"
                 }]
 
         except Exception as e:
@@ -120,7 +120,7 @@ def upload():
                 "Severidade": "Média",
                 "Sugestão de Correção": "—",
                 "Fonte da Norma": "IA",
-                "status": "Erro"
+                "Status": "Erro"
             }]
 
         #Jira + Google Sheets
@@ -151,9 +151,17 @@ def upload():
                     campoSeveridade: barreira['Severidade'],
                     campoNorma: barreira['Regra Avaliada'],
                     campoFonte: barreira['Fonte da Norma'],
-                    campoStatus: barreira['status'],
+                    campoStatus: barreira['Status'],
                     campoSugestaoCorrecao: barreira['Sugestão de Correção'],
                 }
+
+                try:
+                    ticketJira = jira.create_issue(fields=barreira_dict)
+                    flash(f"✅ Ticket criado no Jira: {ticketJira} - {barreira['Descrição da Barreira']}")
+                    # Adiciona o ID do ticket à barreira para salvar futuros feedbacks
+                    barreira['ID Ticket Jira'] = ticketJira.id 
+                except Exception as e:
+                    flash(f"❌ Erro ao criar ticket no Jira: {e.args}")
 
                 barreiras_gsheets.append([
                     barreira['Descrição da Barreira'],
@@ -163,24 +171,21 @@ def upload():
                     barreira['Sugestão de Correção'],
                     barreira['Fonte da Norma'],
                     barreira['Regra Avaliada'],
-                    barreira['status']
+                    barreira['Status'],
+                    barreira['ID Ticket Jira']
                 ])
-
-                try:
-                    jira.create_issue(fields=barreira_dict)
-                    flash(f"✅ Ticket criado no Jira: {barreira['Descrição da Barreira']}")
-                except Exception as e:
-                    flash(f"❌ Erro ao criar ticket no Jira: {e.args}")
-
             # Enviar dados para o Google Sheets
-            sheets_service.spreadsheets().values().append(
-                spreadsheetId=ID_PLANILHA_GSHEETS,
-                range="Barreiras!A1",
-                valueInputOption=TIPO_ENTRADA_GSHEETS,
-                insertDataOption=TIPO_DADO_GSHEETS,
-                body={"values": barreiras_gsheets}
-            ).execute()
-            flash("✅ Barreiras registradas no Google Sheets.")
+            try:
+                sheets_service.spreadsheets().values().append(
+                    spreadsheetId=ID_PLANILHA_GSHEETS,
+                    range="Barreiras!A1",
+                    valueInputOption=TIPO_ENTRADA_GSHEETS,
+                    insertDataOption=TIPO_DADO_GSHEETS,
+                    body={"values": barreiras_gsheets}
+                ).execute()
+                flash("✅ Barreiras registradas no Google Sheets.")
+            except Exception as e:
+                flash(f"❌ Erro ao registrar barreiras no Google Sheets: {e.args}")
         except Exception as e:
             flash(f"❌ Erro ao registrar em planilhas ou Jira: {e}")
 
@@ -192,10 +197,44 @@ def upload():
 
 @app.route('/feedback', methods=['POST'])
 def feedback():
-    id_barreira = request.form.get('id')
+    id_barreira = request.form.get('id_barreira')
     status = request.form.get('status')
-    flash(f"Feedback enviado para barreira {id_barreira}: {status}")
-    return redirect(url_for('index'))
+    descricao = request.form.get('descricao')
+    try:
+        barreira_dict = {
+            campoStatus: status
+        }
+
+        # Atualiza a barreira no Jira e Google Sheets
+        try:
+            jira = obter_jira_service()
+            jira.issue(id_barreira).update(fields=barreira_dict)
+            flash(f"✅ Avaliação registrada no Jira para o ticket {descricao}")
+        except Exception as e:
+            flash(f"❌ Erro ao atualizar ticket {descricao} no Jira: {e.args}")   
+        
+        try:
+            sheets_service = obter_sheets_service()
+            linha = pesquisar_barreira(sheets_service, descricao)
+
+            body = {
+                "values": [[status]]
+            }
+            sheets_service.spreadsheets().values().update(
+                spreadsheetId=ID_PLANILHA_GSHEETS,
+                range=f"Barreiras!H{linha}",
+                valueInputOption='RAW',
+                body=body
+            ).execute()
+
+            flash("✅ Barreira atualizada no Google Sheets.")
+        except Exception as e:
+            flash(f"❌ Erro ao atualizar barreira {descricao} no Google Sheets: {e.args}") 
+    except Exception as e:
+        flash(f"❌ Erro ao registrar avaliação em planilhas ou Jira: {e}")
+
+    flash(f"Feedback enviado para barreira {id_barreira} - {descricao}: {status}")
+    return '', 204
 
 @app.route('/metricas', methods=['POST'])
 def metricas():
@@ -212,23 +251,60 @@ def metricas():
             return redirect(url_for('index'))
 
         metricas = []
-        for linha in valores[1:]:
-            if len(linha) >= 8:
-                metricas.append({
-                    "Descrição da Barreira": linha[0],
-                    "Deficiência Impactada": linha[1],
-                    "Tipo de Deficiência Impactada": linha[2],
-                    "Severidade": linha[3],
-                    "Sugestão de Correção": linha[4],
-                    "Fonte da Norma": linha[5],
-                    "Regra Avaliada": linha[6],
-                    "Status": linha[7],
-                })
+        metricas = obter_barreiras(valores)
 
         return render_template('metricas.html', metricas=metricas)
     except Exception as e:
         flash(f"Erro ao buscar métricas: {e}")
         return redirect(url_for('index'))
+
+@app.route('/avaliacoes', methods=['POST', 'GET'])
+def avaliacoes():
+    sheets_service = obter_sheets_service()
+
+    if request.method == 'POST':
+        id_barreira = request.form.get('id_barreira')
+        status = request.form.get('status')
+        descricao = request.form.get('descricao')
+
+        barreira_dict = {
+            campoStatus: status
+        }
+
+        # Atualiza a barreira no Jira e Google Sheets
+        try:
+            jira = obter_jira_service()
+            jira.issue(id_barreira).update(fields=barreira_dict)
+            flash(f"✅ Avaliação registrada no Jira para o ticket {id_barreira} - {descricao}")
+        except Exception as e:
+            flash(f"❌ Erro ao atualizar ticket {id_barreira} - {descricao} no Jira: {e.args}")
+            
+        linha = pesquisar_barreira(sheets_service, request.form['descricao'])
+        try:
+            sheets_service.spreadsheets().values().update(
+                spreadsheetId=ID_PLANILHA_GSHEETS,
+                range=f"Barreiras!H{linha}",
+                valueInputOption='RAW',
+                body={"values": [[request.form['status']]]}
+            ).execute()
+            flash("✅ Avaliação atualizada com sucesso no Google Sheets.")
+        except Exception as e:
+            flash(f"❌ Erro ao atualizar barreira {request.form['descricao']} no Google Sheets: {e.args}")
+        return redirect(request.referrer)
+    else:
+        try:
+            resultado = sheets_service.spreadsheets().values().get(
+                spreadsheetId=ID_PLANILHA_GSHEETS,
+                range="Barreiras!A1:I"
+            ).execute()
+
+            valores = resultado.get('values', [])
+            barreiras = []
+            barreiras = obter_barreiras(valores)
+            return render_template('avaliacoes.html', barreiras=barreiras)
+        except Exception as e:
+            flash(f"Erro ao buscar avaliações: {e}")
+        return render_template('index.html')
 
 def construir_prompt(content):
     return f"""Você é um auditor especialista em acessibilidade digital com conhecimento técnico aprofundado nas diretrizes:
@@ -284,3 +360,34 @@ A resposta final deve ser uma lista JSON pura com objetos, cada um contendo os s
 Conteúdo a ser analisado:
 {content}
 """
+
+def obter_barreiras(valores):
+    barreiras = []
+    for linha in valores[1:]:
+        if len(linha) >= 9:
+            barreiras.append({
+                "Descrição da Barreira": linha[0],
+                "Deficiência Impactada": linha[1],
+                "Tipo de Deficiência Impactada": linha[2],
+                "Severidade": linha[3],
+                "Sugestão de Correção": linha[4],
+                "Fonte da Norma": linha[5],
+                "Regra Avaliada": linha[6],
+                "Status": linha[7],
+                "ID Ticket Jira": linha[8]
+            })
+    return barreiras
+
+def pesquisar_barreira(sheets_service, descricao):
+    barreira = sheets_service.spreadsheets().values().get(
+        spreadsheetId=ID_PLANILHA_GSHEETS,
+        range=f"Barreiras!A2:A",
+    ).execute()
+
+    values = barreira.get('values', [])
+
+    for i, row in enumerate(values, start=2):
+        if len(row) > 0 and descricao.strip() == row[0].strip():
+            return i
+    return None
+        

@@ -166,9 +166,9 @@
               <td>{{ b["Fonte da Norma"] or "—" }}</td>
               <td>
                 <form action="{{ url_for('feedback') }}" method="POST" class="d-flex gap-2">
-                  <input type="hidden" name="id" value="{{ b['Regra Avaliada'] }}">
-                  <button name="status" value="correto" class="btn btn-outline-success btn-sm" title="Confirmar como correta">✔</button>
-                  <button name="status" value="incorreto" class="btn btn-outline-danger btn-sm" title="Marcar como incorreta">✖</button>
+                  <input type="hidden" name="id" value="{{ b['ID Ticket Jira'] }}">
+                  <button name="status" value="Correto" class="btn btn-outline-success btn-sm" title="Confirmar como correta">✔</button>
+                  <button name="status" value="Incorreto" class="btn btn-outline-danger btn-sm" title="Marcar como incorreta">✖</button>
                 </form>
               </td>
             </tr>
