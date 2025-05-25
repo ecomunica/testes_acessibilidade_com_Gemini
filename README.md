@@ -57,16 +57,39 @@ A solução utiliza Inteligência Artificial generativa (Gemini, via Vertex AI) 
 
 ## Funcionalidades Implementadas
 
-- Exportação de HTML:
+- Revisão Manual e Feedbacks:
+  A aplicação possui uma interface dedicada que permite aos usuários pesquisar, visualizar e avaliar manualmente as barreiras detectadas. 
+  É possível aplicar filtros por status (correto/incorreto), visualizar detalhes técnicos e registrar o feedback humano, que é armazenado para auditoria e aprimoramento da IA.
+
+
+- Exportação de HTML Corrigido:
   Após a análise, o usuário pode baixar um arquivo `.html` contendo o código com as sugestões aplicadas pela IA. 
   Essa funcionalidade permite reaproveitamento direto do conteúdo com correções embutidas.
 
-- Envio de arquivos `.html`, `.jpg`, `.png`
+- Painel de Métricas:
+  A aplicação oferece um painel com filtros interativos e gráficos que mostram:
+    - Número total de barreiras detectadas
+    - Severidade média por tela
+    - Barreiras resolvidas e pendentes
+    - Classificação por tipo de deficiência e status
+
+- Pesquisa de Feedbacks Manuais:
+  Por meio de botões e filtros, é possível visualizar os registros que receberam validação humana. 
+  Essa funcionalidade ajuda na auditoria da IA e na evolução do modelo.
+
+
+- Exportação de HTML Corrigido:
+  Após a análise, o usuário pode baixar um arquivo `.html` contendo o código com as sugestões aplicadas pela IA. 
+  Essa funcionalidade permite reaproveitamento direto do conteúdo com correções embutidas.
+
+- Envio de arquivos `.html`, `.txt`, `.jpg`, `.png`
 - Análise de acessibilidade com IA generativa
 - Registro das barreiras em planilha Google
 - Criação automática de tickets no Jira
 - Interface de revisão manual por analistas
 - Exportação do código HTML com sugestões aplicadas
+- Visualização, filtro e auditoria de feedbacks manuais
+- Painel de métricas com filtros e estatísticas
 - Painel com filtros por severidade, tipo de deficiência e status
 
 ## Observações Técnicas
