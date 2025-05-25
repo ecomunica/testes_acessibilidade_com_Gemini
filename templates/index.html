@@ -182,49 +182,33 @@
         <div class="panel-heading">
           <ul class="nav nav-tabs" id="mainTabs" role="tablist">
             <li class="nav-item" role="presentation">
-              <button class="nav-link active" id="upload-tab" data-bs-toggle="tab" data-bs-target="#upload"
-                type="button" role="tab" aria-controls="upload" aria-selected="true">
-                📁 Enviar arquivo
-              </button>
+              <button class="nav-link active" id="upload-tab" data-bs-toggle="tab" data-bs-target="#upload" type="button" role="tab" aria-controls="upload" aria-selected="true"> 📁 Enviar arquivo </button>
             </li>
             <li class="nav-item" role="presentation">
-              <button class="nav-link" id="metricas-tab" data-bs-toggle="tab" data-bs-target="#metricas" type="button"
-                role="tab" aria-controls="metricas" aria-selected="false">
-                📈 Obter Métricas
-              </button>
+              <button class="nav-link" id="metricas-tab" data-bs-toggle="tab" data-bs-target="#metricas" type="button" role="tab" aria-controls="metricas" aria-selected="false"> 📈 Obter Métricas </button>
             </li>
             <li class="nav-item" role="presentation">
-              <button class="nav-link" id="feedback-tab" data-bs-toggle="tab" data-bs-target="#feedback" type="button"
-                role="tab" aria-controls="feedback" aria-selected="false">
-                🔍 Pesquisar Feedbacks
-              </button>
+              <button class="nav-link" id="feedback-tab" data-bs-toggle="tab" data-bs-target="#feedback" type="button" role="tab" aria-controls="feedback" aria-selected="false"> 🔍 Pesquisar Feedbacks </button>
             </li>
           </ul>
         </div>
         <div class="tab-content" id="mainTabsContent">
           <div class="tab-pane fade show active" id="upload" role="tabpanel" aria-labelledby="upload-tab">
-            <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data"
-              aria-label="Formulário para envio de arquivos para análise de acessibilidade">
+            <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data" aria-label="Formulário para envio de arquivos para análise de acessibilidade">
               <div class="mb-3">
                 <label for="file" class="form-label">Selecione um arquivo para análise:</label>
-                <input type="file" class="form-control" id="file" name="file" required aria-describedby="fileHelp"
-                  accept=".html,.txt,.png,.jpg,.jpeg" />
+                <input type="file" class="form-control" id="file" name="file" required aria-describedby="fileHelp" accept=".html,.txt,.png,.jpg,.jpeg" />
                 <div id="fileHelp" class="form-text text-muted">
                   Aceita arquivos .html, .txt, .png ou .jpg. O conteúdo será
                   analisado automaticamente.
                 </div>
               </div>
-              <button type="submit" class="btn bg-custom-blue w-100" aria-label="Enviar para análise de acessibilidade">
-                ♿ Avaliar Acessibilidade
-              </button>
+              <button type="submit" class="btn bg-custom-blue w-100" aria-label="Enviar para análise de acessibilidade"> ♿ Avaliar Acessibilidade </button>
             </form>
           </div>
           <div class="tab-pane fade" id="metricas" role="tabpanel" aria-labelledby="metricas-tab">
-            <form action="{{ url_for('metricas') }}" method="POST"
-              aria-label="Obter métricas de barreiras já registradas">
-              <button class="btn bg-custom-blue w-100" type="submit" aria-label="Visualizar métricas registradas">
-                📈 Ver Métricas de Barreiras
-              </button>
+            <form action="{{ url_for('metricas') }}" method="POST" aria-label="Obter métricas de barreiras já registradas">
+              <button class="btn bg-custom-blue w-100" type="submit" aria-label="Visualizar métricas registradas"> 📈 Ver Métricas de Barreiras </button>
             </form>
           </div>
         </div>
@@ -235,11 +219,7 @@
         <div class="card-body">
           <form action="{{ url_for('avaliacoes') }}" method="GET" aria-describedby="ajuda-feedback">
             <div class="mb-3">
-              <button class="btn w-100 text-white bg-custom-blue" type="submit" data-bs-toggle="tooltip"
-                aria-label="Pesquisar feedbacks manuais"
-                title="Clique para obter os feedbacks fornecidos manualmente sobre as barreiras de acessibilidade">
-                ♿ Visualizar Feedbacks de Sugestões de Barreiras
-              </button>
+              <button class="btn w-100 text-white bg-custom-blue" type="submit" data-bs-toggle="tooltip" aria-label="Pesquisar feedbacks manuais" title="Clique para obter os feedbacks fornecidos manualmente sobre as barreiras de acessibilidade"> ♿ Visualizar Feedbacks de Sugestões de Barreiras </button>
             </div>
           </form>
         </div>
@@ -254,8 +234,7 @@
   <footer>
     <div class="imagem">
       <p>
-        <b>Projeto acadêmico em desenvolvimento.</b><br />Realizado com os
-        incentivos de:
+        <b>Projeto acadêmico em desenvolvimento.</b><br />Realizado com os incentivos de:
       </p>
       <div>
         <img src="https://hackathonunicesumar.com.br/_assets/media/e4ce6eacf45ee0739892753a88075a7f.png"

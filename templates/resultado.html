@@ -143,20 +143,17 @@
   <main class="container py-4">
     <ul class="nav nav-tabs" id="mainTabs" role="tablist">
       <li class="nav-item" role="presentation">
-        <button class="nav-link" id="upload-tab" data-bs-toggle="tab" data-bs-target="#upload" type="button" role="tab" aria-controls="upload" aria-selected="false">
-          📁 Enviar arquivo
-        </button>
+        <button class="nav-link" id="upload-tab" data-bs-toggle="tab" data-bs-target="#upload" type="button" role="tab" aria-controls="upload" aria-selected="false"> 📁 Enviar arquivo </button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="avaliacao-tab" data-bs-toggle="tab" data-bs-target="#avaliacao" type="button" role="tab" aria-controls="avaliacao" aria-selected="true">
-          📋 Avaliação de Acessibilidade
-        </button>
+        <button class="nav-link active" id="avaliacao-tab" data-bs-toggle="tab" data-bs-target="#avaliacao" type="button" role="tab" aria-controls="avaliacao" aria-selected="true"> 📋 Avaliação de Acessibilidade </button>
       </li>
       <li class="nav-item" role="presentation">
-    <button class="nav-link" id="metricas-tab" data-bs-toggle="tab" data-bs-target="#metricas" type="button" role="tab" aria-controls="metricas" aria-selected="false">
-      📈 Obter Métricas
-    </button>
-  </li>
+        <button class="nav-link" id="metricas-tab" data-bs-toggle="tab" data-bs-target="#metricas" type="button" role="tab" aria-controls="metricas" aria-selected="false"> 📈 Obter Métricas </button>
+	</li>
+	<li class="nav-item" role="presentation">
+        <button class="nav-link" id="feedback-tab" data-bs-toggle="tab" data-bs-target="#feedback" type="button" role="tab" aria-controls="feedback" aria-selected="false"> 🔍 Pesquisar Feedbacks </button>
+	</li>
 </ul>
 <div class="tab-content" id="mainTabsContent">
   <div class="tab-pane fade" id="upload" role="tabpanel" aria-labelledby="upload-tab">
@@ -246,6 +243,18 @@
         <form action="{{ url_for('metricas') }}" method="POST">
           <button class="btn bg-azul w-100" type="submit">📈 Ver Métricas de Barreiras</button>
         </form>
+      </div>
+    </div>
+    <div class="tab-pane fade" id="feedback" role="tabpanel" aria-labelledby="feedback-tab">
+      <div class="card shadow-sm" aria-labelledby="feedback">
+        <div class="card-body">
+          <form action="{{ url_for('avaliacoes') }}" method="GET" aria-describedby="ajuda-feedback">
+            <div class="mb-3">
+              <button class="btn w-100 text-white bg-custom-blue" type="submit" data-bs-toggle="tooltip" aria-label="Pesquisar feedbacks manuais" title="Clique para obter os feedbacks fornecidos manualmente sobre as barreiras de acessibilidade"> ♿ Visualizar Feedbacks de Sugestões de Barreiras </button>
+            </div>
+          </form>
+        </div>
+
       </div>
     </div>
   </main>
