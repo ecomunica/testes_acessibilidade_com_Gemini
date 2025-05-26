@@ -209,8 +209,18 @@ def corrigir():
         flash("Arquivo original não encontrado.")
         return redirect(url_for('index'))
     
-    with open(caminho_arquivo, 'r', encoding='utf-8') as f:
-        conteudo_html = f.read()
+    # Só realiza a correção se for um arquivo HTML ou TXT
+    extensao = nome_arquivo.rsplit('.', 1)[1].lower()
+    if extensao not in {'html', 'txt'}:
+        flash("Arquivo não suportado para correção. Apenas HTML e TXT são permitidos.")
+        return redirect(url_for('index'))
+    
+    try:
+        with open(caminho_arquivo, 'r', encoding='utf-8') as f:
+            conteudo_html = f.read()
+    except UnicodeDecodeError:
+        flash("Erro ao ler o arquivo de texto. Codificação inválida.")
+        return redirect(url_for('index'))
 
     prompt = construir_prompt_correcao(conteudo_html)
         
