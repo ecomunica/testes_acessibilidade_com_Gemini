@@ -9,11 +9,9 @@ import google.generativeai as genai
 import logging
 import io
 
-from gsheets_service import obter_sheets_service, ID_PLANILHA_GSHEETS, TIPO_ENTRADA_GSHEETS, TIPO_DADO_GSHEETS
+from gsheets_service import obter_sheets_service, obter_barreiras, pesquisar_barreira, ID_PLANILHA_GSHEETS, TIPO_ENTRADA_GSHEETS, TIPO_DADO_GSHEETS
 from jira_service import campoNorma, campoSeveridade, campoDescricao, campoDeficiencia, campoFonte, campoStatus, campoSugestaoCorrecao, obter_jira_service
-
-from gsheets_service import obter_sheets_service, ID_PLANILHA_GSHEETS, TIPO_ENTRADA_GSHEETS, TIPO_DADO_GSHEETS
-from jira_service import campoNorma, campoSeveridade, campoDescricao, campoDeficiencia, campoFonte, campoStatus, campoSugestaoCorrecao, obter_jira_service
+from prompt_service import construir_prompt, construir_prompt_correcao
 
 load_dotenv()
 
@@ -125,7 +123,7 @@ def upload():
                 "Status": "Erro"
             }]
 
-        #Jira + Google Sheets
+        # Jira + Google Sheets
         try:
             jira = obter_jira_service()
         
@@ -190,7 +188,7 @@ def upload():
                 flash(f"❌ Erro ao registrar barreiras no Google Sheets: {e.args}")
         except Exception as e:
             flash(f"❌ Erro ao registrar em planilhas ou Jira: {e}")
-        fileme = os.path.basename(filepath)
+        filename = os.path.basename(filepath)
         return render_template('resultado.html', barreiras=barreiras,filepath=filepath,filename=filename)
 
     except Exception as e:
@@ -275,7 +273,7 @@ def feedback():
         flash(f"❌ Erro ao registrar avaliação em planilhas ou Jira: {e}")
 
     flash(f"Feedback enviado para barreira {id_barreira} - {descricao}: {status}")
-    return '', 204
+    return '', 204 # Para evitar redirecionamento
 
 @app.route('/download/<filename>')
 def download(filename):
@@ -350,103 +348,3 @@ def avaliacoes():
         except Exception as e:
             flash(f"Erro ao buscar avaliações: {e}")
         return render_template('index.html')
-
-def construir_prompt(content):
-    return f"""Você é um auditor especialista em acessibilidade digital com conhecimento técnico aprofundado nas diretrizes:
-
-    WCAG 2.1 (níveis A e AA)
-
-    eMAG 3.1 (modelo de acessibilidade brasileiro para serviços públicos)
-
-Sua tarefa é analisar criticamente o conteúdo abaixo
-— que pode ser código HTML ou uma descrição textual de interface
-— e identificar todas as barreiras de acessibilidade presentes.
-— simular uma auditoria completa, analisando o conteúdo a seguir (HTML ou descrição textual de interface) com base em cada um dos critérios de sucesso da WCAG 2.1 níveis A e AA e as principais recomendações do eMAG 3.1, incluindo:
-
-• Imagens com texto alternativo  
-• Contraste de cor e legibilidade  
-• Navegação por teclado  
-• Semântica e uso correto de marcação  
-• Títulos e cabeçalhos claros  
-• Tamanho do foco visível  
-• Uso de linguagem clara  
-• Suporte a tecnologias assistivas  
-• Compatibilidade com leitores de tela  
-• Flexibilidade para adaptação visual  
-• Responsividade e escalabilidade  
-• Acessibilidade de formulários e controles  
-• Acessibilidade de vídeos e áudios  
-• Erros de entrada e sugestões  
-• Evitar conteúdo que pisque ou distraia  
-• Evitar dependência exclusiva de mouse ou gestos
-
-Para cada item analisado, forneça a seguinte estrutura:
-
-    Regra Avaliada
-    Descrição da Barreira
-    Deficiência Impactada
-    Tipo de Deficiência Impactada
-    Severidade
-    Sugestão de Correção
-    Fonte da Norma
-
-Se um critério não for possível de avaliar com base no conteúdo recebido, informe explicitamente: “Não aplicável neste contexto”.
-Além disso, não ultrapasse 250 caracteres para cada descrição de barreira e utilize uma linguagem clara e objetiva.
-
-A resposta final deve ser uma lista JSON pura com objetos, cada um contendo os seguintes campos:
-- "Regra Avaliada"
-- "Descrição da Barreira"
-- "Deficiência Impactada"
-- "Tipo de Deficiência Impactada"
-- "Severidade"
-- "Sugestão de Correção"
-- "Fonte da Norma"
-
-Conteúdo a ser analisado:
-{content}
-"""
-
-def construir_prompt_correcao(content):
-    return f"""
-    Você é um especialista em acessibilidade digital. Corrija o seguinte código HTML com base nas diretrizes WCAG 2.1 (níveis A e AA) e eMAG 3.1.
-
-Seu objetivo é:
-- Corrigir todas as barreiras de acessibilidade.
-- Comentar no código o que foi alterado (com <!-- Comentário -->).
-- Manter a estrutura geral do HTML.
-- Não incluir explicações fora do código. Retorne apenas o código HTML corrigido.
-
-Código original:
-{content}
-"""
-
-def obter_barreiras(valores):
-    barreiras = []
-    for linha in valores[1:]:
-        if len(linha) >= 9:
-            barreiras.append({
-                "Descrição da Barreira": linha[0],
-                "Deficiência Impactada": linha[1],
-                "Tipo de Deficiência Impactada": linha[2],
-                "Severidade": linha[3],
-                "Sugestão de Correção": linha[4],
-                "Fonte da Norma": linha[5],
-                "Regra Avaliada": linha[6],
-                "Status": linha[7],
-                "ID Ticket Jira": linha[8]
-            })
-    return barreiras
-
-def pesquisar_barreira(sheets_service, descricao):
-    barreira = sheets_service.spreadsheets().values().get(
-        spreadsheetId=ID_PLANILHA_GSHEETS,
-        range=f"Barreiras!A2:A",
-    ).execute()
-
-    values = barreira.get('values', [])
-
-    for i, row in enumerate(values, start=2):
-        if len(row) > 0 and descricao.strip() == row[0].strip():
-            return i
-    return None
-        
