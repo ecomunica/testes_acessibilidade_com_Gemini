@@ -17,6 +17,14 @@
       background-color: #345e88;
       color: #000;
     }
+    body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    }
+    main {
+    flex: 1;
+    }
     body.high-contrast {
       background-color: #333333 !important;
       color: #fff !important;
@@ -251,7 +259,7 @@
         <div class="card-body">
           <form action="{{ url_for('avaliacoes') }}" method="GET" aria-describedby="ajuda-feedback">
             <div class="mb-3">
-              <button class="btn w-100 text-white bg-custom-blue" type="submit" data-bs-toggle="tooltip" aria-label="Pesquisar feedbacks manuais" title="Clique para obter os feedbacks fornecidos manualmente sobre as barreiras de acessibilidade"> ♿ Visualizar Feedbacks de Sugestões de Barreiras </button>
+              <button class="btn bg-azul w-100 text-white bg-custom-blue" type="submit" data-bs-toggle="tooltip" aria-label="Pesquisar feedbacks manuais" title="Clique para obter os feedbacks fornecidos manualmente sobre as barreiras de acessibilidade"> ♿ Visualizar Feedbacks de Sugestões de Barreiras </button>
             </div>
           </form>
         </div>
